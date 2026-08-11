@@ -1,0 +1,38 @@
+node_modules/
+dist/
+.DS_Store
+*.local
+.worktrees/
+
+# Local agent/editor state
+.claude/
+.playwright-mcp/
+.vscode/
+AGENT_PROMPT.md
+
+# Generated QA and scratch artifacts
+qa-figma/
+qa-mobile/
+reports/
+
+# Local source/import dumps
+Hardware Gallery/
+public/Hardware Gallery
+
+# Local previews and deployment/runtime-specific files
+deploy.preview.nginx.conf
+dscannabiz-ai-search-light-mode-v16.png
+home__Quality You Can Trust.mov
+packaging-local.png
+pnpm-lock.yaml
+pnpm-workspace.yaml
+
+# Historical one-off hotfixes with environment-specific values
+scripts/dscannabiz-ai-search-hotfix-*.js
+scripts/dscannabiz-hero-edge-hotfix-*.js
+
+# Local browser QA and data import utilities
+scripts/browser-*.mjs
+scripts/inspect-computed.mjs
+scripts/import_hardware_catalog.py
+scripts/extract_hardware_images.py
