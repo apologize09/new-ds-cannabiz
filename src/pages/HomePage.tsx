@@ -45,7 +45,6 @@ const categories = [
     desc: "Magnetic pod-based vaporizer systems",
     img: "/figma/home/263-1497.png",
     href: "/hardware-gallery?cat=pod",
-    featured: true,
   },
   {
     name: "Dab Hardware",
@@ -142,30 +141,63 @@ const partnerLogos = [
 const searchModes = [
   {
     label: "Vape Hardware Search",
+    iconColor: "cyan",
     placeholder: "Search disposable vapes, cartridges, pods and dab hardware",
     route: (query: string) => `/hardware-gallery?q=${encodeURIComponent(query)}`,
   },
   {
     label: "Packaging Design",
+    iconColor: "yellow",
     placeholder: "Describe your packaging design needs... e.g. 'Paper gift box for disposable vape'",
     route: (query: string) => `/product-custom/packaging?q=${encodeURIComponent(query)}`,
   },
   {
     label: "CR Packaging Search",
+    iconColor: "pink",
     placeholder: "Describe your CR packaging needs... e.g. 'Child resistant paper box for cartridge'",
     route: (query: string) => `/product-custom/packaging?q=${encodeURIComponent(query)}&type=cr`,
   },
   {
     label: "Similar Image Search",
+    iconColor: "pink",
     placeholder: "Select a file or drag and drop files here",
     route: null,
   },
   {
     label: "Merchandise Design",
+    iconColor: "cyan",
     placeholder: "e.g. 'Hoodies with logo printing'",
     route: (query: string) => `/product-custom/merchandise?q=${encodeURIComponent(query)}`,
   },
 ] as const;
+
+const heroSearchTagRows = [
+  searchModes.slice(0, 3),
+  searchModes.slice(3, 5),
+] as const;
+
+const heroSearchSparkleColors = {
+  cyan: "#26f6c8",
+  yellow: "#f5c842",
+  pink: "#ff5cb8",
+} as const;
+
+function HeroSearchSparkle({ color }: { color: keyof typeof heroSearchSparkleColors }) {
+  return (
+    <svg
+      className="dsc-hero-search-tag__icon shrink-0"
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      aria-hidden="true"
+    >
+      <path
+        d="M6 1.1 6.95 4.45 10.3 5.4 6.95 6.35 6 9.7 5.05 6.35 1.7 5.4 5.05 4.45 6 1.1Z"
+        fill={heroSearchSparkleColors[color]}
+      />
+    </svg>
+  );
+}
 
 const diversifyByCategory = <T extends { category: string }>(items: T[], limit: number) => {
   const firstByCategory: T[] = [];
@@ -315,21 +347,25 @@ export default function HomePage() {
               Search <ArrowRightOutlined />
             </button>
           </form>
-          <div className="hero-enhance grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:justify-center sm:gap-x-16 sm:gap-y-4">
-            {searchModes.map((item) => (
-              <button
-                type="button"
-                key={item.label}
-                onClick={() => {
-                  setSearchMode(item);
-                  if (item.label === "Similar Image Search") setImageSearchOpen(true);
-                }}
-                aria-pressed={searchMode.label === item.label}
-                className={`dsc-search-mode-button rounded-full border px-3 py-2 text-[10px] transition-colors sm:py-1 ${searchMode.label === item.label ? "border-primary bg-primary text-black" : "border-primary/25 bg-black/50 text-primary"}`}
-              >
-                <SearchOutlined className="mr-1" />
-                {item.label}
-              </button>
+          <div className="dsc-hero-search-tags hero-enhance">
+            {heroSearchTagRows.map((row, rowIndex) => (
+              <div key={rowIndex} className="dsc-hero-search-tags__row">
+                {row.map((item) => (
+                  <button
+                    type="button"
+                    key={item.label}
+                    onClick={() => {
+                      setSearchMode(item);
+                      if (item.label === "Similar Image Search") setImageSearchOpen(true);
+                    }}
+                    aria-pressed={searchMode.label === item.label}
+                    className="dsc-hero-search-tag"
+                  >
+                    <HeroSearchSparkle color={item.iconColor} />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
             ))}
           </div>
           <AnimatePresence initial={false}>
@@ -403,7 +439,7 @@ export default function HomePage() {
           <div className="hero-enhance mx-auto grid max-w-[600px] grid-cols-3 items-start justify-center gap-3 border-t border-primary/20 pt-8 sm:gap-8">
             {stats.map(({ value, label }) => (
               <div key={label} className="text-center">
-                <p className="text-2xl font-bold text-white">{value}</p>
+                <p className="dsc-hero-stat-value text-2xl font-bold text-white">{value}</p>
                 <p className="text-xs text-muted mt-0.5">{label}</p>
               </div>
             ))}
@@ -508,10 +544,10 @@ export default function HomePage() {
       <section data-gsap-reveal className="dsc-home-product-library section-enhance ds-section">
         <div className="ds-container">
           <div className="text-center mb-10">
-            <p className="text-primary text-xs font-semibold uppercase tracking-widest mb-2">
+            <p className="dsc-home-product-library-eyebrow tracking-widest mb-2">
               Product Library
             </p>
-            <h2 className="text-3xl font-bold text-white">
+            <h2 className="font-['Unbounded'] text-3xl font-bold text-white">
               Hardware for Every Need
             </h2>
             <p className="mt-3 text-sm text-muted">
@@ -525,15 +561,13 @@ export default function HomePage() {
               <div key={cat.name}>
                 <Link
                   to={cat.href}
-                  data-home-category-card={cat.featured ? "featured" : "default"}
-                  className={`flex min-h-[310px] flex-col overflow-hidden rounded-2xl border p-5 text-center ${cat.featured ? "border-primary/50 bg-[#102f27]" : "border-border bg-card"}`}
+                  data-home-category-card="default"
+                  className="dsc-home-category-card relative flex h-[310px] flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 text-center"
                 >
-                  <p
-                    className={`text-sm font-semibold ${cat.featured ? "text-white" : "text-white"}`}
-                  >
+                  <p className="dsc-home-category-title shrink-0 text-sm font-semibold leading-tight text-white">
                     {cat.name}
                   </p>
-                  <p className={`mx-auto mt-2 min-h-[34px] max-w-[160px] text-[10px] leading-relaxed ${cat.featured ? "text-white/75" : "text-muted"}`}>
+                  <p className="dsc-home-category-desc mx-auto mt-1 min-h-[34px] max-w-[160px] text-[10px] leading-relaxed text-muted">
                     {cat.desc}
                   </p>
                   <div className="mt-auto flex min-h-[190px] items-end justify-center overflow-hidden">
@@ -546,11 +580,9 @@ export default function HomePage() {
                       className="max-h-[180px] w-full object-contain"
                     />
                   </div>
-                  {cat.featured && (
-                    <span className="mt-2 rounded-lg bg-primary py-2 text-xs font-semibold text-black">
-                      Explore Now →
-                    </span>
-                  )}
+                  <span className="dsc-home-category-cta rounded-lg text-xs font-semibold">
+                    Explore More →
+                  </span>
                 </Link>
               </div>
             ))}

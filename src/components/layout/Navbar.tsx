@@ -5,11 +5,10 @@ import {
   DownOutlined,
   MenuOutlined,
   CloseOutlined,
-  SwapOutlined,
   SunOutlined,
   MoonOutlined,
 } from '@ant-design/icons'
-import BrandMark from '../ui/BrandMark'
+import NavbarBrandSwitcher from './NavbarBrandSwitcher'
 import { useAuth } from '../../providers/AuthProvider'
 import { supabase } from '../../lib/supabase'
 import { motion, useReducedMotion } from 'framer-motion'
@@ -94,25 +93,7 @@ export default function Navbar() {
   return (
     <nav ref={navRef} data-site-navbar className="sticky top-0 z-50 bg-[#090909]/95 backdrop-blur-sm">
       <div className="ds-container relative flex h-[58px] items-center justify-between gap-2 sm:gap-8">
-        <motion.div data-nav-enter className="shrink-0" whileHover={reducedMotion ? undefined : { y: -1 }} transition={{ type: 'spring', stiffness: 420, damping: 28 }}>
-        <Dropdown
-          overlayClassName="dsc-nav-dropdown"
-          menu={{
-            items: [
-              { key: 'ds', label: <Link to="/">DS Cannabiz</Link> },
-              { key: 'dawsen', label: <a href="https://dawsenai.com">Dawsen AI</a> },
-            ],
-            style: { background: theme === 'light' ? '#ffffff' : '#1A1A1A', border: `1px solid ${theme === 'light' ? '#d8d8d2' : '#2A2A2A'}`, color: theme === 'light' ? '#111111' : '#ffffff' },
-          }}
-          trigger={['click']}
-        >
-          <button aria-label="Switch brand" className="flex min-w-0 items-center gap-2">
-            <BrandMark className="h-7 w-7" />
-            <span className="dsc-nav-text truncate font-['Sora'] text-base font-semibold tracking-tight sm:text-lg">DS Cannabiz</span>
-            <SwapOutlined className="text-[11px] text-muted" />
-          </button>
-        </Dropdown>
-        </motion.div>
+        <NavbarBrandSwitcher />
 
         <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
           {navLinks.map((link) =>

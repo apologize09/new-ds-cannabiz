@@ -1,0 +1,122 @@
+.dsc-brand-switcher-overlay.ant-dropdown {
+  padding-top: 8px;
+}
+
+.dsc-brand-switcher-overlay .ant-dropdown-menu {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+.dsc-brand-switcher-panel {
+  box-sizing: border-box;
+  width: min(265px, calc(100vw - 32px));
+  min-height: 120px;
+  padding: 12px;
+  border: 1px solid #313131;
+  border-radius: 12px;
+  background: #1b1b1b;
+}
+
+.dsc-brand-switcher-item {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dsc-brand-switcher-item--active {
+  height: 48px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(38, 246, 200, 0.08);
+}
+
+.dsc-brand-switcher-wordmark {
+  display: block;
+  width: 145.915px;
+  height: 26.255px;
+  max-width: 100%;
+}
+
+.dsc-brand-switcher-item--dawsen {
+  gap: 10px;
+  margin-top: 18px;
+  padding: 0 8px;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.dsc-brand-switcher-item--dawsen:hover,
+.dsc-brand-switcher-item--dawsen:focus-visible {
+  background: rgba(255, 255, 255, 0.04);
+  outline: none;
+}
+
+.dsc-brand-switcher-dawsen-icon {
+  display: block;
+  flex-shrink: 0;
+  width: 23.867px;
+  height: 24px;
+}
+
+.dsc-brand-switcher-dawsen-label {
+  color: #fafafa;
+  font-family: 'Unbounded', system-ui, sans-serif;
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 21px;
+  letter-spacing: -0.42px;
+  white-space: nowrap;
+}
+
+.dsc-brand-switcher-trigger {
+  display: inline-flex;
+  min-width: 0;
+  height: 26.255px;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.dsc-brand-switcher-trigger:focus-visible {
+  border-radius: 8px;
+  outline: 2px solid rgba(38, 246, 200, 0.55);
+  outline-offset: 2px;
+}
+
+.dsc-brand-switcher-trigger .dsc-brand-switcher-wordmark {
+  flex-shrink: 0;
+}
+
+.dsc-brand-switcher-trigger-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Beat [data-site-navbar] span/button white overrides in index.css */
+[data-site-navbar] button.dsc-brand-switcher-trigger .dsc-brand-switcher-trigger-icon,
+[data-site-navbar] button.dsc-brand-switcher-trigger .dsc-brand-switcher-trigger-icon svg,
+:root[data-theme="light"] [data-site-navbar] button.dsc-brand-switcher-trigger .dsc-brand-switcher-trigger-icon,
+:root[data-theme="light"] [data-site-navbar] button.dsc-brand-switcher-trigger .dsc-brand-switcher-trigger-icon svg {
+  color: #26f6c8 !important;
+}
+
+[data-site-navbar] button.dsc-brand-switcher-trigger .dsc-brand-switcher-trigger-icon svg {
+  fill: currentColor !important;
+}
