@@ -149,23 +149,23 @@ export default function ProductCard({ product, onCompare, compareSelected, onCli
           )}
         </div>
 
-        <div className="flex flex-nowrap gap-1 items-center h-[20px]">
+        <div className="flex flex-nowrap items-center gap-1.5">
           {product.tags.slice(0, 2).map((tag) => (
             <span
               key={tag}
-              className={`product-card-tag shrink-0 whitespace-nowrap px-1.5 py-0.5 text-[8px] rounded font-medium leading-none ${TAG_COLORS[tag] ?? ''}`}
+              className={`product-card-tag shrink-0 whitespace-nowrap rounded px-2 py-1 text-[10px] font-medium leading-none ${TAG_COLORS[tag] ?? ''}`}
             >
               {tag}
             </span>
           ))}
           {product.tags.length > 2 && (
-            <span className="product-card-tag shrink-0 whitespace-nowrap px-1.5 py-0.5 text-[8px] rounded font-medium leading-none">
+            <span className="product-card-tag shrink-0 whitespace-nowrap rounded px-2 py-1 text-[10px] font-medium leading-none">
               +{product.tags.length - 2}
             </span>
           )}
         </div>
 
-        <div className="product-card-spec grid grid-cols-2 gap-x-2 gap-y-1 text-[9px]">
+        <div className="product-card-spec grid grid-cols-2 gap-x-2 gap-y-1.5 text-[11px] leading-4">
           <span className="truncate">🔋 {product.batteryCapacity}</span>
           <span className="truncate">💧 {product.tankVolume}</span>
           <span className="truncate">⚡ {product.voltage}</span>

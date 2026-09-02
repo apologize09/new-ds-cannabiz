@@ -1,7 +1,8 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom'
 import { SearchOutlined, AppstoreOutlined, UnorderedListOutlined, SortAscendingOutlined, ShareAltOutlined, CloseOutlined, FilterOutlined } from '@ant-design/icons'
-import { Checkbox, Dropdown } from 'antd'
+import { Dropdown } from 'antd'
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
 import ProductCard from '../components/ui/ProductCard'
 import ProductDetailModal from '../components/ui/ProductDetailModal'
 import { products as fallbackProducts, categories, volumeOptions, shapeOptions, featureOptions, stockOptions } from '../data/products'
@@ -11,6 +12,18 @@ import { productSearchScore } from '../lib/search'
 
 const sortOptions = ['Default', 'Name A-Z', 'Name Z-A', 'Battery (High)', 'Battery (Low)']
 const PAGE_SIZE = 9
+
+function getVisiblePages(current: number, total: number, maxVisible = 5): number[] {
+  if (total <= maxVisible) {
+    return Array.from({ length: total }, (_, index) => index + 1)
+  }
+
+  let start = Math.max(1, current - Math.floor(maxVisible / 2))
+  const end = Math.min(total, start + maxVisible - 1)
+  start = Math.max(1, end - maxVisible + 1)
+
+  return Array.from({ length: end - start + 1 }, (_, index) => start + index)
+}
 
 const normalize = (value: string | undefined | null) =>
   String(value ?? '')
@@ -102,6 +115,22 @@ export default function HardwareGallery() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [page, setPage] = useState(1)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const productsAreaRef = useRef<HTMLDivElement>(null)
+  const shouldScrollOnPageChangeRef = useRef(false)
+
+  const goToPage = (nextPage: number) => {
+    if (nextPage === page) return
+    shouldScrollOnPageChangeRef.current = true
+    setPage(nextPage)
+  }
+
+  useEffect(() => {
+    if (!shouldScrollOnPageChangeRef.current) return
+    shouldScrollOnPageChangeRef.current = false
+    window.requestAnimationFrame(() => {
+      productsAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }, [page])
 
   useEffect(() => {
     setSearch(searchParams.get('q') || '')
@@ -134,6 +163,7 @@ export default function HardwareGallery() {
 
   const activeFilterCount = selectedCats.length + selectedVolumes.length + selectedShapes.length
     + selectedFeatures.length + selectedStock.length
+  const allFiltersClear = activeFilterCount === 0
 
   const shareGallery = async () => {
     const url = window.location.href
@@ -145,7 +175,7 @@ export default function HardwareGallery() {
   }
 
   const availableCategories = useMemo(
-    () => ['ALL', ...categories.filter(category => products.some(product => normalize(product.category) === normalize(category)))],
+    () => categories.filter(category => products.some(product => normalize(product.category) === normalize(category))),
     [products]
   )
 
@@ -210,23 +240,45 @@ export default function HardwareGallery() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const visibleProducts = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
+  const GalleryFilterOption = ({
+    label,
+    checked,
+    onChange,
+  }: {
+    label: string
+    checked: boolean
+    onChange: () => void
+  }) => (
+    <label className={`dsc-gallery-filter-option${checked ? ' is-selected' : ''}`}>
+      <input
+        type="checkbox"
+        className="sr-only"
+        checked={checked}
+        onChange={onChange}
+      />
+      <span className="dsc-gallery-filter-checkbox" aria-hidden="true">
+        {checked ? <Check size={10} stroke="#000000" strokeWidth={3} /> : null}
+      </span>
+      <span className="dsc-gallery-filter-label">{label}</span>
+    </label>
+  )
+
   const FilterSection = ({ title, items, selected, setSelected }: {
     title: string
     items: string[]
     selected: string[]
     setSelected: (v: string[]) => void
   }) => (
-    <div className="space-y-2">
-      <h4 className="dsc-gallery-filter-heading text-xs font-semibold uppercase tracking-wider">{title}</h4>
-      <div className="space-y-1.5">
+    <div className="dsc-gallery-filter-section">
+      <h4 className="dsc-gallery-filter-heading">{title}</h4>
+      <div className="dsc-gallery-filter-options">
         {items.map((item) => (
-          <label key={item} className="flex items-center gap-2 cursor-pointer group">
-            <Checkbox
-              checked={item === 'ALL' ? selected.length === 0 : selected.includes(item)}
-              onChange={() => item === 'ALL' ? setSelected([]) : toggleFilter(item, selected, setSelected)}
-            />
-            <span className="dsc-gallery-filter-label text-[10px] transition-colors">{item}</span>
-          </label>
+          <GalleryFilterOption
+            key={item}
+            label={item}
+            checked={selected.includes(item)}
+            onChange={() => toggleFilter(item, selected, setSelected)}
+          />
         ))}
       </div>
     </div>
@@ -234,7 +286,7 @@ export default function HardwareGallery() {
 
   return (
     <div className="dsc-hardware-gallery bg-[#0a0a0a] pb-20">
-      <div className="mx-auto max-w-[1152px] px-5 pb-8 pt-8 sm:px-0">
+      <div className="ds-container pb-16 pt-8">
       {/* Breadcrumb */}
       <nav className="dsc-gallery-breadcrumb text-xs text-muted mb-4">
         <span className="dsc-gallery-breadcrumb-link cursor-pointer" onClick={() => navigate('/')}>Home</span>
@@ -245,44 +297,64 @@ export default function HardwareGallery() {
       <h1 className="dsc-gallery-title mb-0 text-[32px] font-medium">Hardware Gallery</h1>
       </div>
 
-      <div className="mx-auto max-w-[1152px] px-5 sm:px-0">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs italic text-muted">{filtered.length} products</p>
-        <div className="flex flex-1 flex-wrap items-center justify-end gap-3">
-          <div className="relative w-full sm:w-[400px]"><SearchOutlined className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search products..." className="h-10 w-full rounded-xl border border-border bg-card pl-10 pr-4 text-sm outline-none focus:border-primary"/></div>
-          <button onClick={()=>compareIds.length && setCompareOpen(true)} className="btn-primary h-10 text-sm disabled:cursor-not-allowed disabled:opacity-50" disabled={!compareIds.length}>+ Compare{compareIds.length?` (${compareIds.length})`:''}</button>
-          <button onClick={()=>void shareGallery()} className="dsc-gallery-control flex h-10 items-center gap-2 rounded-md border border-border bg-[#27272a] px-4 text-sm hover:border-primary/50"><ShareAltOutlined/>Share</button>
-          <button
-            onClick={() => setMobileFiltersOpen(true)}
-            className="dsc-gallery-control flex h-10 items-center gap-2 rounded-md border border-border bg-[#27272a] px-4 text-sm lg:hidden"
-            aria-label="Open product filters"
-          >
-            <FilterOutlined /> Filters{activeFilterCount ? ` (${activeFilterCount})` : ''}
-          </button>
-          <Dropdown menu={{items:sortOptions.map(opt=>({key:opt,label:opt,onClick:()=>setSort(opt)}))}} trigger={['click']}><button className="dsc-gallery-control flex h-10 items-center gap-2 rounded-md border border-border bg-[#27272a] px-4 text-sm"><SortAscendingOutlined/>{sort==='Default'?'Sort':sort}</button></Dropdown>
-          <div className="flex h-10 overflow-hidden rounded-md border border-border">
-            <button onClick={()=>setViewMode('grid')} className={`w-9 transition-colors ${viewMode==='grid'?'bg-primary text-black':'dsc-gallery-control bg-[#27272a] text-muted'}`}><AppstoreOutlined/></button>
-            <button onClick={()=>setViewMode('list')} className={`w-9 transition-colors ${viewMode==='list'?'bg-primary text-black':'dsc-gallery-control bg-[#27272a] text-muted'}`}><UnorderedListOutlined/></button>
+      <div className="ds-container">
+      <div ref={productsAreaRef} className="mb-4 flex scroll-mt-20 gap-4">
+        <div className="hidden w-[280px] shrink-0 items-center lg:flex">
+          <p className="dsc-gallery-product-count text-sm italic">{filtered.length} products</p>
+        </div>
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <p className="dsc-gallery-product-count shrink-0 text-sm italic lg:hidden">{filtered.length} products</p>
+          <div className="relative w-[320px] shrink-0">
+            <SearchOutlined className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search products..."
+              className="h-10 w-full rounded-xl border border-border bg-card pl-10 pr-4 text-sm outline-none focus:border-primary"
+            />
+          </div>
+          <div className="ml-auto flex shrink-0 items-center gap-3">
+            <button onClick={()=>compareIds.length && setCompareOpen(true)} className="btn-primary h-10 shrink-0 text-sm disabled:cursor-not-allowed disabled:opacity-50" disabled={!compareIds.length}>+ Compare{compareIds.length?` (${compareIds.length})`:''}</button>
+            <button onClick={()=>void shareGallery()} className="dsc-gallery-control flex h-10 shrink-0 items-center gap-2 rounded-md border border-border bg-[#27272a] px-4 text-sm hover:border-primary/50"><ShareAltOutlined/>Share</button>
+            <button
+              onClick={() => setMobileFiltersOpen(true)}
+              className="dsc-gallery-control flex h-10 shrink-0 items-center gap-2 rounded-md border border-border bg-[#27272a] px-4 text-sm lg:hidden"
+              aria-label="Open product filters"
+            >
+              <FilterOutlined /> Filters{activeFilterCount ? ` (${activeFilterCount})` : ''}
+            </button>
+            <Dropdown menu={{items:sortOptions.map(opt=>({key:opt,label:opt,onClick:()=>setSort(opt)}))}} trigger={['click']}><button className="dsc-gallery-control flex h-10 shrink-0 items-center gap-2 rounded-md border border-border bg-[#27272a] px-4 text-sm"><SortAscendingOutlined/>{sort==='Default'?'Sort':sort}</button></Dropdown>
+            <div className="flex h-10 shrink-0 overflow-hidden rounded-md border border-border">
+              <button onClick={()=>setViewMode('grid')} className={`w-9 transition-colors ${viewMode==='grid'?'bg-primary text-black':'dsc-gallery-control bg-[#27272a] text-muted'}`}><AppstoreOutlined/></button>
+              <button onClick={()=>setViewMode('list')} className={`w-9 transition-colors ${viewMode==='list'?'bg-primary text-black':'dsc-gallery-control bg-[#27272a] text-muted'}`}><UnorderedListOutlined/></button>
+            </div>
           </div>
         </div>
       </div>
-      <div className="flex gap-4">
+      <div className="flex items-start gap-[1.8rem]">
         {/* Sidebar filters */}
-        <aside className="hidden w-[280px] shrink-0 space-y-6 rounded-xl border border-border bg-card p-4 lg:block">
+        <aside className="dsc-gallery-sidebar hidden w-[calc(280px-0.8rem)] shrink-0 lg:block">
+          <GalleryFilterOption
+            label="All"
+            checked={allFiltersClear}
+            onChange={clearFilters}
+          />
+          <div className="dsc-gallery-filter-divider" />
           <FilterSection title="Category" items={availableCategories} selected={selectedCats} setSelected={setSelectedCats} />
-          <div className="border-t border-border" />
+          <div className="dsc-gallery-filter-divider" />
           <FilterSection title="Volume" items={availableVolumes} selected={selectedVolumes} setSelected={setSelectedVolumes} />
-          <div className="border-t border-border" />
+          <div className="dsc-gallery-filter-divider" />
           <FilterSection title="Shape" items={availableShapes} selected={selectedShapes} setSelected={setSelectedShapes} />
-          <div className="border-t border-border" />
+          <div className="dsc-gallery-filter-divider" />
           <FilterSection title="Features" items={availableFeatures} selected={selectedFeatures} setSelected={setSelectedFeatures} />
-          <div className="border-t border-border" />
+          <div className="dsc-gallery-filter-divider" />
           <FilterSection title="Stock" items={availableStock} selected={selectedStock} setSelected={setSelectedStock} />
 
-          {(selectedCats.length || selectedVolumes.length || selectedShapes.length || selectedFeatures.length || selectedStock.length) ? (
+          {!allFiltersClear ? (
             <button
+              type="button"
               onClick={clearFilters}
-              className="text-xs text-primary hover:underline"
+              className="dsc-gallery-filter-clear"
             >
               Clear all filters
             </button>
@@ -313,15 +385,21 @@ export default function HardwareGallery() {
                   <CloseOutlined />
                 </button>
               </div>
-              <div className="space-y-6">
+              <div className="dsc-gallery-sidebar dsc-gallery-sidebar--mobile">
+                <GalleryFilterOption
+                  label="All"
+                  checked={allFiltersClear}
+                  onChange={clearFilters}
+                />
+                <div className="dsc-gallery-filter-divider" />
                 <FilterSection title="Category" items={availableCategories} selected={selectedCats} setSelected={setSelectedCats} />
-                <div className="border-t border-border" />
+                <div className="dsc-gallery-filter-divider" />
                 <FilterSection title="Volume" items={availableVolumes} selected={selectedVolumes} setSelected={setSelectedVolumes} />
-                <div className="border-t border-border" />
+                <div className="dsc-gallery-filter-divider" />
                 <FilterSection title="Shape" items={availableShapes} selected={selectedShapes} setSelected={setSelectedShapes} />
-                <div className="border-t border-border" />
+                <div className="dsc-gallery-filter-divider" />
                 <FilterSection title="Features" items={availableFeatures} selected={selectedFeatures} setSelected={setSelectedFeatures} />
-                <div className="border-t border-border" />
+                <div className="dsc-gallery-filter-divider" />
                 <FilterSection title="Stock" items={availableStock} selected={selectedStock} setSelected={setSelectedStock} />
               </div>
               <div className="sticky bottom-0 mt-6 grid grid-cols-2 gap-3 bg-card pb-1 pt-4">
@@ -448,10 +526,37 @@ export default function HardwareGallery() {
             </div>
           )}
           {filtered.length > PAGE_SIZE && (
-            <div className="mt-8 flex items-center justify-center gap-2">
-              <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} className="rounded-lg border border-border px-3 py-2 text-xs text-muted disabled:opacity-40">Prev</button>
-              <span className="text-xs text-muted">Page {page} of {pageCount}</span>
-              <button onClick={() => setPage(Math.min(pageCount, page + 1))} disabled={page === pageCount} className="rounded-lg border border-border px-3 py-2 text-xs text-muted disabled:opacity-40">Next</button>
+            <div className="dsc-gallery-pagination mt-8 flex items-center justify-center">
+              <button
+                type="button"
+                onClick={() => goToPage(Math.max(1, page - 1))}
+                disabled={page === 1}
+                className="dsc-gallery-pagination-arrow"
+                aria-label="Previous page"
+              >
+                <ChevronLeft size={20} strokeWidth={1.5} />
+              </button>
+              {getVisiblePages(page, pageCount).map((pageNum) => (
+                <button
+                  key={pageNum}
+                  type="button"
+                  onClick={() => goToPage(pageNum)}
+                  className={`dsc-gallery-pagination-page${pageNum === page ? ' is-active' : ''}`}
+                  aria-label={`Page ${pageNum}`}
+                  aria-current={pageNum === page ? 'page' : undefined}
+                >
+                  {pageNum}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => goToPage(Math.min(pageCount, page + 1))}
+                disabled={page === pageCount}
+                className="dsc-gallery-pagination-arrow"
+                aria-label="Next page"
+              >
+                <ChevronRight size={20} strokeWidth={1.5} />
+              </button>
             </div>
           )}
         </div>

@@ -5,26 +5,23 @@ import {
   SearchOutlined,
   ArrowRightOutlined,
   CheckCircleFilled,
-  ThunderboltOutlined,
 } from "@ant-design/icons";
-import BrandMark from "../components/ui/BrandMark";
 import { products as fallbackProducts } from "../data/products";
 import { useCatalog } from "../hooks/useCatalog";
 import { fuzzyScore, productSearchScore } from "../lib/search";
 import { merchandiseTemplates, packagingTemplates, type ProductCustomTemplate } from "../data/productCustomTemplates";
 import type { Product } from "../data/products";
-import {
-  Globe2,
-  Link2,
-  ShoppingCart,
-  ShieldCheck,
-  Package,
-} from "lucide-react";
-
 const stats = [
   { value: "50+", label: "Verified Factories" },
   { value: "500+", label: "SKU Options" },
   { value: "30+", label: "States Served" },
+];
+
+const aboutNetworkStats = [
+  { value: "2017", label: "Founded" },
+  { value: "50+", label: "Factory Partners" },
+  { value: "20+", label: "Countries" },
+  { value: "100+", label: "Brands Served" },
 ];
 
 const categories = [
@@ -106,36 +103,50 @@ const manufacturingPoints = [
 
 const partnerLogos = [
   {
-    name: "Pink Gelato",
+    name: "Gelato",
     src: "/brand-logos/pink-gelato.svg",
     width: 97,
     height: 57,
   },
   {
-    name: "Partner brand",
+    name: "BLINKERS",
     src: "/brand-logos/brand-mark-02.svg",
     width: 237,
     height: 38,
   },
-  { name: "Kadobar", src: "/brand-logos/kadobar.svg", width: 230, height: 43 },
+  { name: "KADOBAR", src: "/brand-logos/kadobar.svg", width: 230, height: 43 },
   {
-    name: "Flum Mello",
+    name: "FLUM",
     src: "/brand-logos/flum-mello.svg",
     width: 93,
     height: 44,
   },
   {
-    name: "Partner brand",
-    src: "/brand-logos/brand-mark-05.svg",
+    name: "Petro",
+    src: "/brand-logos/petro.svg",
     width: 75,
     height: 51,
   },
   {
-    name: "Partner brand",
+    name: "PRYZM",
     src: "/brand-logos/brand-logo-06.svg",
     width: 166,
     height: 32,
   },
+];
+
+const aiMatchingStats = [
+  { v: "< 30s", l: "Match Time" },
+  { v: "95%", l: "Accuracy Rate" },
+  { v: "3-5", l: "Options Per Query" },
+  { v: "24/7", l: "Always Available" },
+] as const;
+
+const packagingFeatures = [
+  "Real-time 3D preview with photorealistic rendering",
+  "Multiple Packaging Models Available",
+  "Custom logo placement and packaging design",
+  "Instant quote generation based on your configuration",
 ];
 
 const searchModes = [
@@ -307,9 +318,16 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent pointer-events-none" />
         <div className="pointer-events-none absolute bottom-0 left-1/2 h-[260px] w-[min(1000px,160vw)] -translate-x-1/2 rounded-full bg-primary/20 blur-[100px] sm:h-[360px] sm:blur-[120px]" />
         <div className="ds-container relative z-10 space-y-6 lg:-translate-y-[4.5vh]">
-          <div className="dsc-hero-pill hero-enhance inline-flex items-center gap-2 bg-card border border-border text-muted text-xs px-3 py-1.5 rounded-full">
-            <ThunderboltOutlined className="text-primary" /> B2B One Stop
-            Purchasing Platform
+          <div className="dsc-hero-eyebrow hero-enhance">
+            <span className="dsc-hero-eyebrow__decor dsc-hero-eyebrow__decor--left" aria-hidden="true">
+              <span className="dsc-hero-eyebrow__line" />
+              <span className="dsc-hero-eyebrow__dot" />
+            </span>
+            <span className="dsc-hero-eyebrow__text">B2B One Stop Purchasing Platform</span>
+            <span className="dsc-hero-eyebrow__decor dsc-hero-eyebrow__decor--right" aria-hidden="true">
+              <span className="dsc-hero-eyebrow__dot" />
+              <span className="dsc-hero-eyebrow__line" />
+            </span>
           </div>
           <h1 className="hero-enhance font-['Unbounded'] text-[clamp(2rem,12vw,3.35rem)] font-bold leading-[1.05] text-white sm:text-5xl md:text-[72px]">
             You Define a Request,
@@ -593,317 +611,300 @@ export default function HomePage() {
       <section data-gsap-reveal className="dsc-home-capabilities section-enhance ds-section">
         <div className="ds-container">
           <div className="text-center mb-12">
-            <p className="text-primary text-xs font-semibold uppercase tracking-widest mb-2">
+            <p className="dsc-home-capabilities-eyebrow tracking-widest mb-2">
               Platform Capabilities
             </p>
-            <h2 className="text-3xl font-bold text-white">
+            <h2 className="font-['Unbounded'] text-3xl font-bold text-white">
               Everything You Need in One Place
             </h2>
+            <p className="mt-3 text-sm text-muted">
+            DS Cannabiz combines AI intelligence, 3D design tools, and supply chain expertise to streamline your sourcing workflow.
+            </p>
           </div>
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <div className="dsc-home-capabilities-grid grid grid-cols-1 gap-5 md:grid-cols-2">
             {features.map((item) => (
-              <div key={item.title}>
-                <Link
-                  to={item.href}
-                  data-capability-card={item.light ? "mint" : "dark"}
-                  className={`group grid min-h-[250px] grid-cols-1 overflow-hidden rounded-2xl border p-6 card-hover sm:min-h-[280px] sm:grid-cols-[0.9fr_1.1fr] sm:p-7 ${item.light ? "border-primary/40 bg-primary text-black" : "border-border bg-card text-white"}`}
-                >
-                  <div
-                    className={`flex flex-col justify-start ${item.imageSide === "left" ? "order-2 sm:pl-4" : "order-1 sm:pr-4"}`}
-                  >
-                    <h3 className="mb-6 text-base font-bold leading-tight sm:text-lg">
-                      {item.title}
-                    </h3>
-                    <p
-                      className={`text-xs leading-relaxed sm:text-sm ${item.light ? "text-black/70" : "text-primary"}`}
-                    >
-                      {item.desc}
-                    </p>
-                  </div>
-                  <div
-                    className={`${item.imageSide === "left" ? "order-1" : "order-2"} flex items-center justify-center`}
-                  >
-                    <img
-                      src={item.image}
-                      alt=""
-                      width="510"
-                      height="510"
-                      loading="eager"
-                      className="max-h-[210px] w-full object-contain"
-                    />
-                  </div>
-                </Link>
-              </div>
+              <Link
+                key={item.title}
+                to={item.href}
+                data-capability-card={item.light ? "mint" : "dark"}
+                className={`dsc-home-capability-card dsc-home-capability-card--${item.light ? "mint" : "dark"} ${item.imageSide === "left" ? "dsc-home-capability-card--image-left" : "dsc-home-capability-card--image-right"}`}
+              >
+                <div className="dsc-home-capability-card__content">
+                  <h3 className="dsc-home-capability-card__title">{item.title}</h3>
+                  <p className="dsc-home-capability-card__desc">{item.desc}</p>
+                </div>
+                <div className="dsc-home-capability-card__media">
+                  <img
+                    src={item.image}
+                    alt=""
+                    width="510"
+                    height="510"
+                    loading="eager"
+                    className="dsc-home-capability-card__image"
+                  />
+                </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section data-gsap-reveal className="section-enhance ds-section">
-        <div className="ds-container grid overflow-hidden rounded-3xl border border-border bg-card md:grid-cols-2">
-          <div className="order-2 flex flex-col justify-center space-y-5 p-6 sm:p-10 md:order-2">
-            <p className="text-primary text-xs font-semibold uppercase tracking-widest">
-              3D Packaging Customization
-            </p>
-            <h2 className="text-3xl font-bold text-white">
-              Design Your Product Online
-            </h2>
-            <p className="text-muted text-sm leading-relaxed">
-              With our 3D packaging design tool, you can customize the colors,
-              materials and patterns of any packaging in the template. You can
-              preview your design effects in real time before placing an order.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/product-custom/packaging" className="btn-primary">
-                Try Customization
-              </Link>
-              <Link to="/plans" className="btn-ghost">
-                Plans
-              </Link>
-            </div>
-          </div>
-          <div className="order-1 flex min-h-[320px] flex-col items-center justify-center overflow-hidden bg-[#111] p-4 sm:min-h-[470px] sm:p-6">
-            <div className="relative aspect-[1.78/1] w-full overflow-hidden rounded-2xl bg-[#eef2f1]">
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={packagingPreview}
-                  className="absolute inset-0"
-                  initial={reducedMotion ? false : { opacity: 0, x: 16, filter: "blur(4px)" }}
-                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                  exit={reducedMotion ? undefined : { opacity: 0, x: -8, filter: "blur(3px)" }}
-                  transition={{ type: "spring", duration: reducedMotion ? 0 : 0.42, bounce: 0 }}
+      <section data-gsap-reveal className="dsc-home-packaging-section section-enhance ds-section">
+        <div className="ds-container">
+          <div className="dsc-home-packaging-panel grid overflow-hidden rounded-3xl md:grid-cols-2">
+            <div className="dsc-home-packaging-preview order-1 flex min-h-[320px] flex-col items-center justify-center p-4 sm:min-h-[470px] sm:p-6">
+              <div className="dsc-home-packaging-preview__frame relative aspect-[1.78/1] w-full overflow-hidden rounded-2xl">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={packagingPreview}
+                    className="absolute inset-0"
+                    initial={reducedMotion ? false : { opacity: 0, x: 16, filter: "blur(4px)" }}
+                    animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                    exit={reducedMotion ? undefined : { opacity: 0, x: -8, filter: "blur(3px)" }}
+                    transition={{ type: "spring", duration: reducedMotion ? 0 : 0.42, bounce: 0 }}
+                  >
+                    {packagingPreview === "mockup" && (
+                      <img
+                        src="/figma/home/263-1878.png"
+                        alt="Packaging mockup preview"
+                        className="h-full w-full object-cover object-top"
+                      />
+                    )}
+                    {packagingPreview === "dieline" && (
+                      <img
+                        src="/figma-local/截屏2026-06-29 20.19.38 1.png"
+                        alt="Packaging dieline preview"
+                        className="h-full w-full object-contain p-6 sm:p-10"
+                      />
+                    )}
+                    {packagingPreview === "video" && (
+                      <div className="grid h-full grid-cols-2 bg-[#f5f5f5]">
+                        <img src="/figma-local/Video-3.png" alt="Packaging animation front view" className="h-full w-full object-contain p-5" />
+                        <img src="/figma-local/Video-2.png" alt="Packaging animation perspective view" className="h-full w-full object-contain p-5" />
+                      </div>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+              <div
+                className="dsc-home-packaging-tabs relative mt-5 grid w-full max-w-[730px] grid-cols-4 rounded-full p-1 text-sm sm:text-base"
+                role="tablist"
+                aria-label="Packaging preview"
+              >
+                {(["mockup", "dieline", "video"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    role="tab"
+                    aria-selected={packagingPreview === tab}
+                    onClick={() => setPackagingPreview(tab)}
+                    className={`dsc-home-packaging-tab relative z-10 rounded-full px-2 py-2 capitalize transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${packagingPreview === tab ? "is-active" : ""}`}
+                  >
+                    {packagingPreview === tab && (
+                      <motion.span
+                        layoutId="packaging-preview-pill"
+                        className="dsc-home-packaging-tab__pill absolute inset-0 -z-10 rounded-full"
+                        transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                      />
+                    )}
+                    {tab}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => void sharePackagingTool()}
+                  className="dsc-home-packaging-tab rounded-full px-2 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
                 >
-                  {packagingPreview === "mockup" && <img src="/figma/home/263-1878.png" alt="Packaging mockup preview" className="absolute inset-x-0 top-0 w-full max-w-none" style={{ clipPath: "inset(0 0 14% 0)" }} />}
-                  {packagingPreview === "dieline" && <img src="/figma-local/截屏2026-06-29 20.19.38 1.png" alt="Packaging dieline preview" className="h-full w-full object-contain p-6 sm:p-10" />}
-                  {packagingPreview === "video" && <div className="grid h-full grid-cols-2 bg-[#f5f5f5]"><img src="/figma-local/Video-3.png" alt="Packaging animation front view" className="h-full w-full object-contain p-5"/><img src="/figma-local/Video-2.png" alt="Packaging animation perspective view" className="h-full w-full object-contain p-5"/></div>}
-                </motion.div>
-              </AnimatePresence>
+                  Share
+                </button>
+              </div>
             </div>
-            <div className="relative mt-5 grid w-full max-w-[730px] grid-cols-4 rounded-full bg-white p-1 text-sm text-[#333] sm:text-base" role="tablist" aria-label="Packaging preview">
-              {(["mockup", "dieline", "video"] as const).map((tab) => <button key={tab} type="button" role="tab" aria-selected={packagingPreview === tab} onClick={() => setPackagingPreview(tab)} className={`relative z-10 rounded-full px-2 py-2 capitalize transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${packagingPreview === tab ? "text-black" : "text-[#333]"}`}>{packagingPreview === tab && <motion.span layoutId="packaging-preview-pill" className="absolute inset-0 -z-10 rounded-full bg-primary" transition={{ type: "spring", stiffness: 420, damping: 32 }} />}{tab}</button>)}
-              <button type="button" onClick={() => void sharePackagingTool()} className="rounded-full px-2 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">Share</button>
+            <div className="dsc-home-packaging-content order-2 flex flex-col justify-center p-6 sm:p-10">
+              <p className="dsc-home-packaging-eyebrow">3D Packaging Customization</p>
+              <h2 className="dsc-home-packaging-title">Design Your Product Online</h2>
+              <p className="dsc-home-packaging-desc">
+                With our 3D packaging design tool, you can customize the colors,
+                materials and patterns of any packaging in the template. You can
+                preview your design effects in real time before placing an order.
+              </p>
+              <ul className="dsc-home-packaging-features">
+                {packagingFeatures.map((item) => (
+                  <li key={item}>
+                    <CheckCircleFilled className="dsc-home-packaging-features__icon" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link to="/product-custom/packaging" className="dsc-home-packaging-cta">
+                Try Customization <ArrowRightOutlined />
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      <section data-gsap-reveal className="dsc-ai-matching-section section-enhance ds-section bg-black">
-        <div className="ds-container grid min-h-[680px] items-center gap-8 md:grid-cols-2 md:gap-12">
-          <div className="space-y-5">
-            <p className="text-primary text-xs font-semibold uppercase tracking-widest">
-              AI-Powered Matching
-            </p>
-            <h2 className="text-3xl font-bold text-white">
-              Smart Sourcing, Zero Guesswork
-            </h2>
-            <p className="text-muted text-sm leading-relaxed">
+      <section data-gsap-reveal className="dsc-ai-matching-section section-enhance ds-section">
+        <div className="ds-container dsc-home-ai-matching-grid">
+          <div className="dsc-home-ai-matching-content">
+            <p className="dsc-home-ai-matching-eyebrow">AI-Powered Matching</p>
+            <h2 className="dsc-home-ai-matching-title">Smart Sourcing, Zero Guesswork</h2>
+            <p className="dsc-home-ai-matching-desc">
               Describe what you need in plain language. Our AI analyzes your
               requirements against our database of 1,000+ products and 50+
               factories to find the perfect matches.
             </p>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[
-                { v: "< 30s", l: "Match Time" },
-                { v: "95%", l: "Accuracy Rate" },
-                { v: "3-5", l: "Options Per Query" },
-                { v: "24/7", l: "Always Available" },
-              ].map(({ v, l }) => (
-                <div
-                  key={l}
-                  className="bg-card border border-border rounded-xl p-4 text-center"
-                >
-                  <p className="text-2xl font-bold text-white">{v}</p>
-                  <p className="text-xs text-muted mt-1">{l}</p>
+            <div className="dsc-home-ai-matching-stats">
+              {aiMatchingStats.map(({ v, l }) => (
+                <div key={l} className="dsc-home-ai-matching-stat">
+                  <p className="dsc-home-ai-matching-stat__value">{v}</p>
+                  <p className="dsc-home-ai-matching-stat__label">{l}</p>
                 </div>
               ))}
             </div>
-            <Link
-              to="/hardware-gallery"
-              className="btn-primary inline-flex items-center gap-2"
-            >
+            {/* <Link to="/hardware-gallery" className="dsc-home-ai-matching-cta">
               Try AI Sourcing <ArrowRightOutlined />
-            </Link>
+            </Link> */}
           </div>
-          <div className="flex min-h-[500px] items-center justify-center overflow-hidden">
+          <div className="dsc-home-ai-matching-visual">
             <img
               src="/figma/home/263-1687.png"
               alt="AI-Powered Sourcing"
               width="1702"
               height="1190"
               loading="eager"
-              className="w-full object-contain"
+              className="dsc-home-ai-matching-visual__image"
             />
           </div>
         </div>
       </section>
 
-      <section className="dsc-quality-section section-enhance bg-black px-4 py-12 sm:px-6 sm:py-16">
-        <div className="mx-auto grid min-h-[770px] max-w-[1555px] items-center gap-8 rounded-3xl bg-card p-5 sm:p-12 md:grid-cols-2 md:gap-12">
-          <div className="relative min-h-[424px] overflow-hidden rounded-xl bg-[#111]">
-            <img
-              src="/figma/source/e4a739bbebb6d30cd0a3a833c76af46bbd67bd0c.png"
-              alt="Quality You Can Trust"
-              width="1488"
-              height="848"
-              loading="eager"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-transparent" />
-          </div>
-          <div className="space-y-5">
-            <p className="text-primary text-xs font-semibold uppercase tracking-widest">
-              Verified Factories
-            </p>
-            <h2 className="text-3xl font-bold text-white">
-              Quality You Can Trust
-            </h2>
-            <p className="text-muted text-sm leading-relaxed">
-              Every product on DS Cannabiz comes from audited, certified
-              manufacturers. We maintain rigorous quality standards from raw
-              materials to final packaging.
-            </p>
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {manufacturingPoints.map((point) => (
-                <li
-                  key={point}
-                  className="flex items-start gap-3 text-xs text-gray-300"
-                >
-                  <CheckCircleFilled className="mt-0.5 text-primary" />
-                  {point}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section className="dsc-about-network-section section-enhance relative mx-auto min-h-[860px] w-[calc(100%-40px)] max-w-[1555px] overflow-hidden rounded-b-[44px] bg-black pt-16 text-center sm:min-h-[980px] sm:pt-20">
-        <div className="relative z-10 mx-auto max-w-[1400px] space-y-7 px-5">
-          <p className="text-sm text-primary sm:text-base">About DS Cannabiz</p>
-          <h2 className="font-['Unbounded'] text-[30px] font-semibold leading-[1.22] text-white sm:text-[48px]">
-            Bridging Cannabis Brands with China's
-            <br className="hidden sm:block" /> Best Manufacturers
-          </h2>
-          <p className="mx-auto max-w-[900px] text-sm leading-[1.55] text-muted sm:text-base">
-            DS Cannabiz is a B2B platform that connects cannabis brands
-            worldwide with verified Chinese manufacturers. We leverage AI
-            technology and 3D visualization tools to make your sourcing
-            transparent, efficient, and customizable.
-          </p>
-          <p className="mx-auto max-w-[960px] text-sm leading-[1.55] text-muted sm:text-base">
-            Our mission is to eliminate the friction in cross-border hardware,
-            packaging & merchandise procurement — from product discovery and CMF
-            customization to quality assurance and logistics. Whether you're a
-            startup brand or an established distributor, DS Cannabiz provides
-            the tools and networks you need to bring your products to market
-            faster.
-          </p>
-        </div>
-        <svg
-          className="pointer-events-none absolute left-0 top-[330px] hidden h-[470px] w-full sm:block"
-          viewBox="0 0 1555 470"
-          fill="none"
-          aria-hidden="true"
-        >
-          {[0, 1, 2, 3, 4, 5, 6].map((index) => (
-            <>
-              <path
-                key={`l${index}`}
-                d={`M0 ${55 + index * 44} C230 ${270 + index * 14}, 470 ${325 + index * 8}, 777 300`}
-                stroke="#16d9c2"
-                strokeWidth="2"
-                strokeOpacity={0.34 + index * 0.07}
+      <section data-gsap-reveal className="dsc-quality-section section-enhance ds-section">
+        <div className="ds-container">
+          <div className="dsc-home-quality-panel">
+            <div className="dsc-home-quality-visual">
+              <img
+                src="/figma/source/e4a739bbebb6d30cd0a3a833c76af46bbd67bd0c.png"
+                alt="Quality You Can Trust"
+                width="1488"
+                height="848"
+                loading="eager"
+                className="dsc-home-quality-visual__image"
               />
-              <path
-                key={`r${index}`}
-                d={`M1555 ${55 + index * 44} C1325 ${270 + index * 14}, 1085 ${325 + index * 8}, 777 300`}
-                stroke="#16d9c2"
-                strokeWidth="2"
-                strokeOpacity={0.34 + index * 0.07}
-              />
-            </>
-          ))}
-        </svg>
-        <div className="absolute left-[7%] top-[430px] z-10 hidden h-20 w-20 place-items-center rounded-full bg-[#22dbc8] text-white sm:grid">
-          <Globe2 size={46} />
-        </div>
-        <div className="absolute right-[7%] top-[430px] z-10 hidden h-20 w-20 place-items-center rounded-full bg-[#22dbc8] text-white sm:grid">
-          <Link2 size={44} />
-        </div>
-        <div className="absolute left-[15%] top-[610px] z-10 hidden h-20 w-20 place-items-center rounded-full bg-[#22dbc8] text-3xl font-bold text-white sm:grid">
-          3D
-        </div>
-        <div className="absolute right-[14%] top-[625px] z-10 hidden h-14 w-14 place-items-center rounded-full bg-[#22dbc8] text-white sm:grid">
-          <Package size={30} />
-        </div>
-        <div className="absolute bottom-[150px] left-[3%] z-10 hidden h-16 w-16 place-items-center rounded-full bg-[#22dbc8] text-white sm:grid">
-          <ShoppingCart size={34} />
-        </div>
-        <div className="absolute bottom-[200px] right-[3%] z-10 hidden h-16 w-16 place-items-center rounded-full bg-[#22dbc8] text-white sm:grid">
-          <ShieldCheck size={34} />
-        </div>
-        <div className="absolute left-1/2 top-[565px] z-10 grid h-[130px] w-[130px] -translate-x-1/2 place-items-center rounded-[28px] bg-white sm:top-[590px]">
-          <BrandMark className="h-[92px] w-[92px]" />
-        </div>
-        <div className="absolute inset-x-0 bottom-0 z-0 h-[250px] rounded-b-[44px] bg-black" />
-        <div className="absolute inset-x-0 bottom-[105px] z-10 mx-auto grid max-w-[1150px] grid-cols-2 gap-8 px-6 sm:grid-cols-4">
-          {[
-            { v: "2017", l: "Founded" },
-            { v: "50+", l: "Factory Partners" },
-            { v: "20+", l: "Countries" },
-            { v: "100+", l: "Brands Served" },
-          ].map(({ v, l }) => (
-            <div key={l}>
-              <p className="text-2xl font-bold text-white sm:text-3xl">{v}</p>
-              <p className="mx-auto mt-3 w-fit rounded-full border border-primary px-3 py-1 text-xs text-primary">
-                {l}
-              </p>
             </div>
-          ))}
+            <div className="dsc-home-quality-content">
+              <p className="dsc-home-quality-eyebrow">Verified Factories</p>
+              <h2 className="dsc-home-quality-title">Quality You Can Trust</h2>
+              <p className="dsc-home-quality-desc">
+                Every product on DS Cannabiz comes from audited, certified
+                manufacturers. We maintain rigorous quality standards from raw
+                materials to final packaging.
+              </p>
+              <ul className="dsc-home-quality-features">
+                {manufacturingPoints.map((point) => (
+                  <li key={point}>
+                    <CheckCircleFilled className="dsc-home-quality-features__icon" aria-hidden="true" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="dsc-source-section section-enhance bg-primary px-4 py-14 text-black sm:px-6 sm:py-20">
-        <div className="mx-auto max-w-[1200px] space-y-10 text-center">
-          <div className="space-y-5">
-            <h2 className="text-3xl font-bold sm:text-4xl">
-              Ready to Source Smarter?
+      <section className="dsc-about-network-section section-enhance relative overflow-hidden rounded-b-[44px] bg-black text-center">
+        <div className="dsc-about-network-section__inner">
+          <header className="dsc-about-network-copy">
+            <span className="dsc-about-network-eyebrow">About DS Cannabiz</span>
+            <h2 className="dsc-about-network-title">
+              <span className="dsc-about-network-title__line">
+                Bridging Cannabis Brands with China&apos;s
+              </span>
+              <span className="dsc-about-network-title__line">
+                Best Manufacturers
+              </span>
             </h2>
-            <p className="mx-auto max-w-md text-sm text-black/70">
+            <p className="dsc-about-network-desc dsc-about-network-desc--primary">
+              DS Cannabiz is a B2B platform that connects cannabis brands
+              worldwide with verified Chinese manufacturers. We leverage AI
+              technology and 3D visualization tools to make your sourcing
+              transparent, efficient, and customizable.
+            </p>
+            <p className="dsc-about-network-desc dsc-about-network-desc--secondary">
+              Our mission is to eliminate the friction in cross-border hardware,
+              packaging & merchandise procurement — from product discovery and CMF
+              customization to quality assurance and logistics. Whether you&apos;re a
+              startup brand or an established distributor, DS Cannabiz provides
+              the tools and networks you need to bring your products to market
+              faster.
+            </p>
+          </header>
+
+          <div className="dsc-about-network-stage" aria-hidden="true">
+            <img
+              src="/figma/home/about-network.svg"
+              alt=""
+              width={2213}
+              height={680}
+              loading="lazy"
+              decoding="async"
+              className="dsc-about-network-stage__svg"
+            />
+          </div>
+
+          <div className="dsc-about-network-stats">
+            {aboutNetworkStats.map(({ value, label }) => (
+              <div key={label} className="dsc-about-network-stat">
+                <p className="dsc-about-network-stat__value">{value}</p>
+                <p className="dsc-about-network-stat__label">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="dsc-source-section section-enhance">
+        <div className="dsc-source-section__inner">
+          <div className="dsc-source-section__content">
+            <h2 className="dsc-source-section__title">Ready to Source Smarter?</h2>
+            <p className="dsc-source-section__desc">
               Join hundreds of brands who trust DS for their needs.
               <br />
               Get started with a free consultation today.
             </p>
-            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <div className="dsc-source-section__actions">
               <button
                 type="button"
                 onClick={() =>
                   window.dispatchEvent(new Event("open-sales-chat"))
                 }
-                className="dsc-source-cta-sales rounded-lg bg-black px-7 py-3 font-semibold text-white transition-colors hover:bg-gray-900"
+                className="dsc-source-section__cta dsc-source-section__cta--sales"
               >
                 Talk To Sales
+                <ArrowRightOutlined aria-hidden="true" />
               </button>
               <Link
                 to="/hardware-gallery"
-                className="dsc-source-cta-browse rounded-lg border border-black px-7 py-3 font-semibold text-black transition-colors hover:bg-black/10"
+                className="dsc-source-section__cta dsc-source-section__cta--browse"
               >
                 Browse Products
               </Link>
             </div>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-7">
-            {partnerLogos.map((logo, index) => (
-              <img
-                key={`${logo.src}-${index}`}
-                src={logo.src}
-                alt={logo.name}
-                width={logo.width}
-                height={logo.height}
-                loading="eager"
-                className="dsc-partner-logo h-auto max-h-10 max-w-[140px] object-contain opacity-100 transition-opacity duration-300 hover:opacity-100"
-              />
-            ))}
+          <div className="dsc-source-section__logos" aria-label="Partner brands">
+            <div className="dsc-source-section__logos-track">
+              {partnerLogos.map((logo) => (
+                <img
+                  key={logo.name}
+                  src={logo.src}
+                  alt={logo.name}
+                  width={logo.width}
+                  height={logo.height}
+                  loading="lazy"
+                  className="dsc-source-section__logo"
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>

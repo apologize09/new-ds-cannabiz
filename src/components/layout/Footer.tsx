@@ -1,17 +1,13 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  LinkedinOutlined,
-  FacebookOutlined,
-  InstagramOutlined,
-  YoutubeOutlined,
+  CloseOutlined,
   GlobalOutlined,
   EnvironmentOutlined,
-  PhoneOutlined,
-  MailOutlined,
 } from '@ant-design/icons'
-import BrandMark from '../ui/BrandMark'
+import { Check, Instagram, Linkedin, Mail, MapPin, Phone, Send, Youtube } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import './NavbarBrandSwitcher.css'
 
 const footerLinks = {
   'Product Library': [
@@ -35,6 +31,12 @@ const footerLinks = {
   ],
 }
 
+const socialLinks = [
+  { Icon: Linkedin, label: 'LinkedIn', href: 'https://linkedin.com' },
+  { Icon: Instagram, label: 'Instagram', href: 'https://instagram.com' },
+  { Icon: Youtube, label: 'YouTube', href: 'https://youtube.com' },
+]
+
 export default function Footer() {
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
@@ -48,58 +50,134 @@ export default function Footer() {
   }
 
   return (
-    <footer className="dsc-site-footer border-t border-border bg-bg mt-20">
+    <footer className="dsc-site-footer border-t border-border bg-bg">
       <div className="dsc-footer-main ds-container px-6 py-16 sm:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
+        <div className="dsc-footer-grid grid grid-cols-1 md:grid-cols-5 gap-12">
           <div className="md:col-span-2 flex flex-col items-start gap-6">
-            <Link to="/" className="flex items-center gap-2">
-              <BrandMark className="h-7 w-7" />
-              <span className="font-bold text-text">DS Cannabiz</span>
+            <Link to="/" className="inline-flex items-center">
+              <img
+                src="/brand-logos/ds-cannabiz-wordmark.svg"
+                alt="DS Cannabiz"
+                width={146}
+                height={26}
+                className="dsc-brand-switcher-wordmark"
+                draggable={false}
+              />
             </Link>
-            <p className="text-muted text-sm leading-relaxed max-w-xs">
+            <p className="dsc-footer-desc text-sm leading-relaxed max-w-xs">
               Your one-stop B2B platform for cannabis products on AI-powered sourcing and 3D CMF customization.
             </p>
             <div className="w-full space-y-3">
-              <p className="text-xs font-semibold text-text uppercase tracking-widest">Subscribe & Get News</p>
-              <form onSubmit={subscribe} className="flex w-full max-w-xs gap-2">
+              <p className="dsc-footer-subscribe-label text-xs font-semibold uppercase tracking-widest">
+                Subscribe &amp; Get News
+              </p>
+              <form onSubmit={subscribe} className="dsc-footer-subscribe-form flex w-full max-w-xs gap-2">
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(event) => { setEmail(event.target.value); setSubscribed(false) }}
                   placeholder="Enter your email"
-                  className="flex-1 bg-card border border-border text-sm text-text px-3 py-2 rounded-lg placeholder:text-muted focus:outline-none focus:border-primary/50"
+                  className="dsc-footer-subscribe-input flex-1 text-sm px-3 py-2 rounded-lg focus:outline-none"
                 />
-                <button type="submit" aria-label="Subscribe & Get News" className="bg-primary px-4 py-2 rounded-lg text-sm font-medium !text-black hover:bg-primary-dark transition-colors">
-                  <span className="!text-black" aria-hidden="true">{subscribed ? '✓' : '→'}</span>
+                <button
+                  type="submit"
+                  aria-label="Subscribe & Get News"
+                  className="dsc-footer-subscribe-submit"
+                >
+                  {subscribed ? (
+                    <Check
+                      aria-hidden="true"
+                      className="dsc-footer-subscribe-submit__icon"
+                      size={16}
+                      stroke="#000"
+                      strokeWidth={2}
+                    />
+                  ) : (
+                    <Send
+                      aria-hidden="true"
+                      className="dsc-footer-subscribe-submit__icon"
+                      size={16}
+                      stroke="#000"
+                      strokeWidth={2}
+                    />
+                  )}
                 </button>
               </form>
             </div>
-            <div className="space-y-3 text-sm text-muted">
-              <p className="flex items-center gap-2"><MailOutlined /> info@weedevice.com</p>
-              <p className="flex items-center gap-2"><PhoneOutlined /> +1 (800) 123-4567</p>
-              <p className="flex items-center gap-2"><EnvironmentOutlined /> Los Angeles, CA, United States</p>
-              <div className="relative">
+            <div className="dsc-footer-contact">
+              <div className="dsc-footer-contact__item">
+                <p className="dsc-footer-contact__label">How can we help?</p>
+                <p className="dsc-footer-contact__value">info@weedevice.com</p>
+              </div>
+              <div className="dsc-footer-contact__item">
+                <p className="dsc-footer-contact__label">Contact Us</p>
+                <p className="dsc-footer-contact__value">+1 (800) 123-4567</p>
+              </div>
+              <div className="dsc-footer-contact__item">
+                <p className="dsc-footer-contact__label">HQ Location</p>
+                <p className="dsc-footer-contact__value">Los Angeles, CA, United States</p>
+              </div>
+              <div
+                className="dsc-footer-contact__tech relative"
+                onMouseEnter={() => setTechOpen(true)}
+                onMouseLeave={() => setTechOpen(false)}
+              >
                 <button
                   type="button"
                   data-tech-center-trigger
                   aria-expanded={techOpen}
                   aria-controls="tech-center-popover"
-                  onMouseEnter={() => setTechOpen(true)}
-                  onMouseLeave={() => setTechOpen(false)}
-                  onFocus={() => setTechOpen(true)}
-                  onBlur={() => setTechOpen(false)}
                   onClick={() => setTechOpen((open) => !open)}
-                  className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-text hover:text-primary"
+                  className={`dsc-footer-tech-center-trigger${techOpen ? ' is-open' : ''}`}
                 >
-                  <EnvironmentOutlined /> TECH CENTER NEAR ME
+                  <EnvironmentOutlined aria-hidden="true" />
+                  TECH CENTER NEAR ME
                 </button>
                 {techOpen && (
-                  <div id="tech-center-popover" data-tech-center-popover className="dsc-tech-center-popover absolute bottom-full left-0 z-20 mb-3 w-64 rounded-xl border border-border bg-card p-4 text-left text-xs leading-5 text-muted shadow-2xl">
-                    <p className="dsc-tech-center-popover-title font-semibold text-text">DS Cannabiz Tech Center</p>
-                    <p className="mt-1">Los Angeles, CA, United States</p>
-                    <p>info@weedevice.com</p>
-                    <p>+1 (800) 123-4567</p>
+                  <div
+                    id="tech-center-popover"
+                    data-tech-center-popover
+                    className="dsc-tech-center-popover"
+                    role="dialog"
+                    aria-label="New York Service Center"
+                  >
+                    <div className="dsc-tech-center-popover__header">
+                      <h3 className="dsc-tech-center-popover__title">NEW YORK SERVICE CENTER</h3>
+                      <button
+                        type="button"
+                        className="dsc-tech-center-popover__close"
+                        aria-label="Close"
+                        onClick={() => setTechOpen(false)}
+                      >
+                        <CloseOutlined aria-hidden="true" />
+                      </button>
+                    </div>
+                    <div className="dsc-tech-center-popover__map">
+                      <img
+                        src="/figma/footer/tech-center-map.png"
+                        alt=""
+                        width={420}
+                        height={168}
+                        draggable={false}
+                      />
+                    </div>
+                    <div className="dsc-tech-center-popover__details">
+                      <div className="dsc-tech-center-popover__detail">
+                        <MapPin aria-hidden="true" size={14} stroke="#22d8c2" strokeWidth={1.75} />
+                        <span>Los Angeles, CA, United States</span>
+                      </div>
+                      <div className="dsc-tech-center-popover__detail-row">
+                        <div className="dsc-tech-center-popover__detail">
+                          <Phone aria-hidden="true" size={14} stroke="#22d8c2" strokeWidth={1.75} />
+                          <span>+1 (800) 123-4567</span>
+                        </div>
+                        <div className="dsc-tech-center-popover__detail">
+                          <Mail aria-hidden="true" size={14} stroke="#22d8c2" strokeWidth={1.75} />
+                          <span>info@weedevice.com</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -107,25 +185,25 @@ export default function Footer() {
           </div>
 
           {Object.entries(footerLinks).map(([section, links]) => (
-            <div key={section} className="space-y-4">
-              <h4 className="text-text font-semibold text-sm uppercase tracking-wide">{section}</h4>
-              <ul className="space-y-2">
+            <div key={section} className="dsc-footer-nav space-y-4">
+              <h4 className="dsc-footer-nav-heading text-sm uppercase tracking-wide">{section}</h4>
+              <ul className="dsc-footer-nav-list space-y-2.5">
                 {links.map((link) => (
                   <li key={link.label}>
                     {link.href === '#talk-to-sales' ? (
                       <button
                         type="button"
                         onClick={() => window.dispatchEvent(new CustomEvent('open-sales-chat'))}
-                        className="text-muted text-sm hover:text-text transition-colors"
+                        className="dsc-footer-nav-link text-sm transition-colors"
                       >
                         {link.label}
                       </button>
                     ) : link.href.startsWith('http') ? (
-                      <a href={link.href} className="text-muted text-sm hover:text-white transition-colors">
+                      <a href={link.href} className="dsc-footer-nav-link text-sm transition-colors">
                         {link.label}
                       </a>
                     ) : (
-                      <Link to={link.href} className="text-muted text-sm hover:text-text transition-colors">
+                      <Link to={link.href} className="dsc-footer-nav-link text-sm transition-colors">
                         {link.label}
                       </Link>
                     )}
@@ -137,21 +215,28 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-border">
-        <div className="ds-container flex flex-col items-center justify-between gap-3 py-4 sm:flex-row">
-          <p className="text-muted text-xs">© 2026 DS Cannabiz. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            <Link to="/privacy" className="text-muted text-xs hover:text-text">Privacy Policy</Link>
-            <Link to="/terms" className="text-muted text-xs hover:text-text">Terms of Service</Link>
+      <div className="dsc-footer-bottom border-t border-border">
+        <div className="ds-container dsc-footer-bottom__inner flex flex-col items-center justify-between gap-4 px-6 py-5 sm:flex-row sm:px-8">
+          <p className="dsc-footer-bottom-copy text-xs">© 2026 DS Cannabiz. All rights reserved.</p>
+          <div className="dsc-footer-bottom-legal flex items-center gap-3">
+            <Link to="/privacy" className="dsc-footer-bottom-link text-xs transition-colors">Privacy Policy</Link>
+            <span className="dsc-footer-bottom-divider" aria-hidden="true">|</span>
+            <Link to="/terms" className="dsc-footer-bottom-link text-xs transition-colors">Terms of Service</Link>
           </div>
-          <div className="flex items-center gap-3">
-            {[LinkedinOutlined, FacebookOutlined, InstagramOutlined, YoutubeOutlined].map((Icon, i) => (
-              <button key={i} className="text-muted hover:text-white text-base transition-colors">
-                <Icon />
-              </button>
+          <div className="dsc-footer-bottom-actions flex items-center gap-3">
+            {socialLinks.map(({ Icon, label, href }) => (
+              <a
+                key={label}
+                href={href}
+                aria-label={label}
+                className="dsc-footer-social-btn transition-colors"
+              >
+                <Icon aria-hidden="true" size={14} strokeWidth={1.5} />
+              </a>
             ))}
-            <button className="flex items-center gap-1 text-muted text-xs hover:text-white">
-              <GlobalOutlined /> English
+            <button type="button" className="dsc-footer-lang-btn flex items-center gap-1.5 text-xs transition-colors">
+              <GlobalOutlined aria-hidden="true" />
+              English
             </button>
           </div>
         </div>

@@ -59,11 +59,18 @@ export default function ProductCustomList({ kind }: { kind: ProductCustomKind })
           </div>
         ) : (
           <div className="ds-grid">
-            {items.map((item, index) => (
-              <Link key={`${item.kind}-${item.id}`} to={`${basePath}/${item.id}/edit${query ? `?q=${encodeURIComponent(query)}` : ''}`} className={`group min-h-[390px] overflow-hidden rounded-xl border bg-card sm:h-[449px] ${index === 0 ? 'border-[rgba(38,246,200,0.4)]' : 'border-border'}`}>
+            {items.map((item) => (
+              <Link
+                key={`${item.kind}-${item.id}`}
+                to={`${basePath}/${item.id}/edit${query ? `?q=${encodeURIComponent(query)}` : ''}`}
+                className="group min-h-[390px] overflow-hidden rounded-xl border border-border bg-card transition-[border-color,box-shadow] duration-300 ease-out hover:border-[rgba(38,246,200,0.4)] sm:h-[449px]"
+              >
                 <div className="relative m-[14px] flex h-[270px] items-center justify-center overflow-hidden bg-[#27272a] p-1 sm:h-[330px]">
-                  <img src={`/figma-local/${item.image}`} alt={item.name} className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.03]" />
-                  {index === 0 && <span className="absolute flex items-center gap-2 rounded-lg bg-[#26f6c8] px-5 py-2 font-['Sora'] text-sm font-semibold text-black"><ToolOutlined />Custom</span>}
+                  <img src={`/figma-local/${item.image}`} alt={item.name} className="h-full w-full object-contain transition-transform duration-300 ease-out group-hover:scale-[1.03]" />
+                  <span className="pointer-events-none absolute flex translate-y-1 scale-95 items-center gap-2 rounded-lg bg-[#26f6c8] px-5 py-2 font-['Sora'] text-sm font-semibold text-black opacity-0 shadow-[0_8px_24px_rgba(38,246,200,0.25)] transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100">
+                    <ToolOutlined />
+                    Custom
+                  </span>
                 </div>
                 <div className="px-4 pt-[5px]">
                   <h2 className="font-['Sora'] text-sm font-semibold leading-[22px] text-foreground">{item.name}</h2>
