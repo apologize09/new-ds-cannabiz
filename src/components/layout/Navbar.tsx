@@ -95,7 +95,7 @@ export default function Navbar() {
       <div className="ds-container relative flex h-[58px] items-center justify-between gap-2 sm:gap-8">
         <NavbarBrandSwitcher />
 
-        <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
+        <div className="absolute left-1/2 hidden max-w-[min(100%,42rem)] -translate-x-1/2 items-center gap-0.5 lg:flex xl:gap-1">
           {navLinks.map((link) =>
             link.children ? (
               <motion.div data-nav-enter key={link.label} whileHover={reducedMotion ? undefined : { y: -1 }} whileTap={reducedMotion ? undefined : { scale: 0.98 }} transition={{ type: 'spring', stiffness: 450, damping: 30 }}>
@@ -112,7 +112,7 @@ export default function Navbar() {
               >
                 <Link
                   to={link.href}
-                  className={`flex items-center gap-1 px-3 py-1.5 text-sm rounded-md transition-colors ${
+                  className={`flex items-center gap-1 whitespace-nowrap px-2 py-1.5 text-sm rounded-md transition-colors xl:px-3 ${
                     isActive(link.href) ? 'text-primary' : 'dsc-nav-link'
                   }`}
                 >
@@ -125,7 +125,7 @@ export default function Navbar() {
               <motion.div data-nav-enter key={link.label} whileHover={reducedMotion ? undefined : { y: -1 }} whileTap={reducedMotion ? undefined : { scale: 0.98 }} transition={{ type: 'spring', stiffness: 450, damping: 30 }}>
               <Link
                 to={link.href}
-                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                className={`whitespace-nowrap px-2 py-1.5 text-sm rounded-md transition-colors xl:px-3 ${
                   isActive(link.href) ? 'text-primary' : 'dsc-nav-link'
                 }`}
               >
@@ -134,13 +134,13 @@ export default function Navbar() {
               </motion.div>
             ),
           )}
-          <a data-nav-enter href="https://printing.dscannabiz.com" className="dsc-nav-link flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors">
+          <a data-nav-enter href="https://printing.dscannabiz.com" className="dsc-nav-link flex items-center gap-1.5 whitespace-nowrap px-2 py-1.5 text-sm transition-colors xl:px-3">
             Printing
-            <motion.span data-hot-badge whileHover={reducedMotion ? undefined : { scale: 1.12, rotate: -2 }} transition={{ type: 'spring', stiffness: 500, damping: 24 }} className="inline-block origin-center rounded bg-primary px-1.5 py-0.5 text-[9px] font-bold uppercase leading-none tracking-wide text-black">HOT</motion.span>
+            <motion.span data-hot-badge whileHover={reducedMotion ? undefined : { scale: 1.12, rotate: -2 }} transition={{ type: 'spring', stiffness: 500, damping: 24 }} className="inline-block shrink-0 origin-center rounded bg-primary px-1.5 py-0.5 text-[9px] font-bold uppercase leading-none tracking-wide text-black">HOT</motion.span>
           </a>
         </div>
 
-        <div data-nav-enter className="hidden md:flex items-center gap-3">
+        <div data-nav-enter className="hidden shrink-0 items-center gap-3 lg:flex">
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             aria-label="Toggle theme"
@@ -156,7 +156,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 bg-card border border-border px-3 py-1.5 rounded-lg text-sm hover:border-primary/50 transition-colors"
               >
                 <span className="text-primary font-semibold">+</span>
-                <span className="dsc-nav-text">{credits} credits</span>
+                <span className="dsc-nav-text whitespace-nowrap">{credits} credits</span>
               </button>
 
               <Dropdown
@@ -184,13 +184,13 @@ export default function Navbar() {
           )}
         </div>
 
-        <button className="dsc-nav-control grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-border bg-card md:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Open navigation menu">
+        <button className="dsc-nav-control grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-border bg-card lg:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Open navigation menu">
           {mobileOpen ? <CloseOutlined /> : <MenuOutlined />}
         </button>
       </div>
 
       {mobileOpen && (
-        <div className="max-h-[calc(100svh-58px)] overflow-y-auto border-t border-border bg-card px-5 py-4 md:hidden">
+        <div className="max-h-[calc(100svh-58px)] overflow-y-auto border-t border-border bg-card px-5 py-4 lg:hidden">
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             aria-label="Toggle theme"
