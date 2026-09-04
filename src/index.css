@@ -238,6 +238,25 @@ img, video, canvas, svg { max-width: 100%; }
   background: #111111;
 }
 
+.product-card-media > button {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  max-height: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.product-card-media > button[data-compare-product] {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  max-width: 24px;
+  max-height: 24px;
+  padding: 0;
+}
+
 .product-card {
   background: #171717;
   color: #ffffff;
@@ -2287,6 +2306,92 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   border-color: #36363a !important;
 }
 
+.dsc-gallery-sort-panel {
+  box-sizing: border-box;
+  display: flex;
+  width: 240px;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  background: #1f2123;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.dsc-gallery-sort-option {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #fafafa;
+  font-family: 'Sora', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.25;
+  text-align: left;
+  white-space: normal;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.dsc-gallery-sort-option:hover:not(.is-active) {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.dsc-gallery-sort-option.is-active {
+  border-color: #22d8c2;
+  background: rgba(34, 216, 194, 0.08);
+  color: #22d8c2;
+}
+
+.dsc-gallery-sort-option:focus-visible {
+  outline: 2px solid rgba(34, 216, 194, 0.45);
+  outline-offset: 1px;
+}
+
+.dsc-product-specs {
+  overflow: hidden;
+  border: 1px solid #2a2a2a;
+  border-radius: 16px;
+  background: #27272A;
+}
+
+.dsc-product-specs-row {
+  display: grid;
+  grid-template-columns: minmax(128px, 0.92fr) 1.15fr;
+  align-items: start;
+  column-gap: 20px;
+  padding: 11px 20px;
+  border-bottom: 1px solid #333333;
+}
+
+.dsc-product-specs-row:last-child {
+  border-bottom: none;
+}
+
+.dsc-product-specs-label,
+.dsc-product-specs-value {
+  font-family: 'Sora', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.dsc-product-specs-label {
+  color: #8a8a8a;
+  font-weight: 400;
+}
+
+.dsc-product-specs-value {
+  color: #d4d4d4;
+  font-weight: 500;
+}
+
 .dsc-hardware-gallery .dsc-gallery-pagination {
   gap: 1.5rem;
 }
@@ -2388,6 +2493,43 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   background: #ffffff !important;
   color: #111111 !important;
   border-color: #d8d8d2 !important;
+}
+
+:root[data-theme="light"] .dsc-gallery-sort-panel {
+  border-color: #d8d8d2;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgba(17, 17, 17, 0.08);
+}
+
+:root[data-theme="light"] .dsc-gallery-sort-option {
+  color: #111111;
+}
+
+:root[data-theme="light"] .dsc-gallery-sort-option:hover:not(.is-active) {
+  background: rgba(17, 17, 17, 0.04);
+}
+
+:root[data-theme="light"] .dsc-gallery-sort-option.is-active {
+  border-color: #22d8c2;
+  background: rgba(34, 216, 194, 0.12);
+  color: #008f72;
+}
+
+:root[data-theme="light"] .dsc-product-specs {
+  border-color: #d8d8d2;
+  background: #ffffff;
+}
+
+:root[data-theme="light"] .dsc-product-specs-row {
+  border-bottom-color: #e8e8e4;
+}
+
+:root[data-theme="light"] .dsc-product-specs-label {
+  color: #6b6b6b;
+}
+
+:root[data-theme="light"] .dsc-product-specs-value {
+  color: #111111;
 }
 
 :root[data-theme="light"] .dsc-hardware-gallery .dsc-gallery-pagination-arrow {

@@ -120,3 +120,23 @@
 [data-site-navbar] button.dsc-brand-switcher-trigger .dsc-brand-switcher-trigger-icon svg {
   fill: currentColor !important;
 }
+
+:root[data-theme="light"] .dsc-brand-switcher-panel {
+  border-color: #d8d8d2;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgba(17, 17, 17, 0.08);
+}
+
+:root[data-theme="light"] .dsc-brand-switcher-item--active {
+  border-color: rgba(17, 17, 17, 0.08);
+  background: rgba(38, 246, 200, 0.12);
+}
+
+:root[data-theme="light"] .dsc-brand-switcher-item--dawsen:hover,
+:root[data-theme="light"] .dsc-brand-switcher-item--dawsen:focus-visible {
+  background: rgba(17, 17, 17, 0.04);
+}
+
+:root[data-theme="light"] .dsc-brand-switcher-dawsen-label {
+  color: #111111;
+}
