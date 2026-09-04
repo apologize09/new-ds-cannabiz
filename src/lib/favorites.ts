@@ -12,16 +12,17 @@ export async function loadFavoriteIds(userId: string): Promise<Set<string>> {
   if (cache?.userId === userId && !cache.promise) return cache.ids
   if (cache?.userId === userId && cache.promise) return cache.promise
 
-  const promise = supabase
-    .from('favorites')
-    .select('product_id')
-    .eq('user_id', userId)
-    .then(({ data, error }) => {
-      const ids = new Set((data ?? []).map((row) => row.product_id))
-      if (!error) cache = { userId, ids }
-      else if (cache?.userId === userId) cache = { userId, ids: cache.ids }
-      return ids
-    })
+  const promise = Promise.resolve(
+    supabase
+      .from('favorites')
+      .select('product_id')
+      .eq('user_id', userId),
+  ).then(({ data, error }) => {
+    const ids = new Set((data ?? []).map((row) => row.product_id))
+    if (!error) cache = { userId, ids }
+    else if (cache?.userId === userId) cache = { userId, ids: cache.ids }
+    return ids
+  })
 
   cache = { userId, ids: cache?.userId === userId ? cache.ids : new Set(), promise }
   const ids = await promise
