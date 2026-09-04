@@ -1,16 +1,16 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom'
-import { SearchOutlined, AppstoreOutlined, UnorderedListOutlined, SortAscendingOutlined, ShareAltOutlined, CloseOutlined, FilterOutlined } from '@ant-design/icons'
-import { Dropdown } from 'antd'
+import { SearchOutlined, AppstoreOutlined, UnorderedListOutlined, ShareAltOutlined, CloseOutlined, FilterOutlined } from '@ant-design/icons'
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
 import ProductCard from '../components/ui/ProductCard'
 import ProductDetailModal from '../components/ui/ProductDetailModal'
+import GallerySortDropdown from '../components/ui/GallerySortDropdown'
+import type { GallerySortOption } from '../constants/gallerySort'
 import { products as fallbackProducts, categories, volumeOptions, shapeOptions, featureOptions, stockOptions } from '../data/products'
 import type { Product } from '../data/products'
 import { useCatalog } from '../hooks/useCatalog'
 import { productSearchScore } from '../lib/search'
 
-const sortOptions = ['Default', 'Name A-Z', 'Name Z-A', 'Battery (High)', 'Battery (Low)']
 const PAGE_SIZE = 9
 
 function getVisiblePages(current: number, total: number, maxVisible = 5): number[] {
@@ -98,7 +98,7 @@ const categoryParamMap: Record<string, string> = {
 }
 
 export default function HardwareGallery() {
-  const { products } = useCatalog(fallbackProducts)
+  const { products, loading } = useCatalog(fallbackProducts)
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { sku } = useParams()
@@ -108,7 +108,7 @@ export default function HardwareGallery() {
   const [selectedShapes, setSelectedShapes] = useState<string[]>([])
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [selectedStock, setSelectedStock] = useState<string[]>([])
-  const [sort, setSort] = useState('Default')
+  const [sort, setSort] = useState<GallerySortOption>('Default')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [compareIds, setCompareIds] = useState<string[]>([])
   const [compareOpen, setCompareOpen] = useState(false)
@@ -199,6 +199,14 @@ export default function HardwareGallery() {
     [products]
   )
 
+  const catalogOrder = useMemo(() => {
+    const rank = new Map<string, number>()
+    products.forEach((product, index) => {
+      rank.set(product.id, products.length - index)
+    })
+    return rank
+  }, [products])
+
   const filtered = useMemo(() => {
     let result = [...products]
 
@@ -227,13 +235,25 @@ export default function HardwareGallery() {
       )
     }
 
-    if (sort === 'Name A-Z') result.sort((a, b) => a.id.localeCompare(b.id))
-    else if (sort === 'Name Z-A') result.sort((a, b) => b.id.localeCompare(a.id))
-    else if (sort === 'Battery (High)') result.sort((a, b) => parseInt(b.batteryCapacity) - parseInt(a.batteryCapacity))
-    else if (sort === 'Battery (Low)') result.sort((a, b) => parseInt(a.batteryCapacity) - parseInt(b.batteryCapacity))
+    if (sort === 'Featured') {
+      result.sort((a, b) =>
+        Number(Boolean(b.featured)) - Number(Boolean(a.featured))
+        || (catalogOrder.get(b.id) ?? 0) - (catalogOrder.get(a.id) ?? 0)
+      )
+    } else if (sort === 'Popularity, more to less') {
+      result.sort((a, b) =>
+        (b.popularity ?? catalogOrder.get(b.id) ?? 0) - (a.popularity ?? catalogOrder.get(a.id) ?? 0)
+      )
+    } else if (sort === 'Date, new to old') {
+      result.sort((a, b) => {
+        const aTime = a.createdAt ? Date.parse(a.createdAt) : (catalogOrder.get(a.id) ?? 0)
+        const bTime = b.createdAt ? Date.parse(b.createdAt) : (catalogOrder.get(b.id) ?? 0)
+        return bTime - aTime
+      })
+    }
 
     return result
-  }, [products, search, selectedCats, selectedVolumes, selectedShapes, selectedFeatures, selectedStock, sort])
+  }, [products, search, selectedCats, selectedVolumes, selectedShapes, selectedFeatures, selectedStock, sort, catalogOrder])
 
   useEffect(() => { setPage(1) }, [search, selectedCats, selectedVolumes, selectedShapes, selectedFeatures, selectedStock, sort])
 
@@ -300,11 +320,15 @@ export default function HardwareGallery() {
       <div className="ds-container">
       <div ref={productsAreaRef} className="mb-4 flex scroll-mt-20 gap-4">
         <div className="hidden w-[280px] shrink-0 items-center lg:flex">
-          <p className="dsc-gallery-product-count text-sm italic">{filtered.length} products</p>
+          <p className="dsc-gallery-product-count text-sm italic">
+            {loading ? '…' : `${filtered.length} products`}
+          </p>
         </div>
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <p className="dsc-gallery-product-count shrink-0 text-sm italic lg:hidden">{filtered.length} products</p>
-          <div className="relative w-[320px] shrink-0">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
+          <p className="dsc-gallery-product-count shrink-0 text-sm italic lg:hidden">
+            {loading ? '…' : `${filtered.length} products`}
+          </p>
+          <div className="relative min-w-0 w-full max-w-[320px] flex-1 basis-[12rem] sm:flex-none sm:basis-auto sm:w-[320px]">
             <SearchOutlined className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input
               value={search}
@@ -313,7 +337,7 @@ export default function HardwareGallery() {
               className="h-10 w-full rounded-xl border border-border bg-card pl-10 pr-4 text-sm outline-none focus:border-primary"
             />
           </div>
-          <div className="ml-auto flex shrink-0 items-center gap-3">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto sm:gap-3">
             <button onClick={()=>compareIds.length && setCompareOpen(true)} className="btn-primary h-10 shrink-0 text-sm disabled:cursor-not-allowed disabled:opacity-50" disabled={!compareIds.length}>+ Compare{compareIds.length?` (${compareIds.length})`:''}</button>
             <button onClick={()=>void shareGallery()} className="dsc-gallery-control flex h-10 shrink-0 items-center gap-2 rounded-md border border-border bg-[#27272a] px-4 text-sm hover:border-primary/50"><ShareAltOutlined/>Share</button>
             <button
@@ -323,7 +347,7 @@ export default function HardwareGallery() {
             >
               <FilterOutlined /> Filters{activeFilterCount ? ` (${activeFilterCount})` : ''}
             </button>
-            <Dropdown menu={{items:sortOptions.map(opt=>({key:opt,label:opt,onClick:()=>setSort(opt)}))}} trigger={['click']}><button className="dsc-gallery-control flex h-10 shrink-0 items-center gap-2 rounded-md border border-border bg-[#27272a] px-4 text-sm"><SortAscendingOutlined/>{sort==='Default'?'Sort':sort}</button></Dropdown>
+            <GallerySortDropdown value={sort} onChange={setSort} />
             <div className="flex h-10 shrink-0 overflow-hidden rounded-md border border-border">
               <button onClick={()=>setViewMode('grid')} className={`w-9 transition-colors ${viewMode==='grid'?'bg-primary text-black':'dsc-gallery-control bg-[#27272a] text-muted'}`}><AppstoreOutlined/></button>
               <button onClick={()=>setViewMode('list')} className={`w-9 transition-colors ${viewMode==='list'?'bg-primary text-black':'dsc-gallery-control bg-[#27272a] text-muted'}`}><UnorderedListOutlined/></button>
@@ -434,23 +458,6 @@ export default function HardwareGallery() {
               </button>
             )}
 
-            <Dropdown
-              menu={{
-                items: sortOptions.map((opt) => ({
-                  key: opt,
-                  label: opt,
-                  onClick: () => setSort(opt),
-                })),
-                style: { background: '#1A1A1A', border: '1px solid #2A2A2A' },
-              }}
-              trigger={['click']}
-            >
-              <button className="flex items-center gap-2 bg-card border border-border text-sm text-white px-3 py-2 rounded-lg hover:border-primary/50 transition-colors">
-                <SortAscendingOutlined />
-                {sort}
-              </button>
-            </Dropdown>
-
             <div className="flex border border-border rounded-lg overflow-hidden">
               <button
                 onClick={() => setViewMode('grid')}
@@ -467,7 +474,9 @@ export default function HardwareGallery() {
             </div>
           </div>
 
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div className="py-20 text-center text-sm text-muted">Loading products…</div>
+          ) : filtered.length === 0 ? (
             <div className="text-center py-20 text-muted">
               <p className="text-4xl mb-3">🔍</p>
               <p className="text-lg font-medium text-white">Nothing Found</p>
@@ -525,7 +534,7 @@ export default function HardwareGallery() {
               )}
             </div>
           )}
-          {filtered.length > PAGE_SIZE && (
+          {!loading && filtered.length > PAGE_SIZE && (
             <div className="dsc-gallery-pagination mt-8 flex items-center justify-center">
               <button
                 type="button"

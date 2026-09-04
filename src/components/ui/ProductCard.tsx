@@ -3,6 +3,7 @@ import { HeartOutlined, HeartFilled, PlusOutlined } from '@ant-design/icons'
 import type { Product } from '../../data/products'
 import { useAuth } from '../../providers/AuthProvider'
 import { supabase } from '../../lib/supabase'
+import { loadFavoriteIds, setFavoriteCached } from '../../lib/favorites'
 
 interface Props {
   product: Product
@@ -22,6 +23,7 @@ const TAG_COLORS: Record<string, string> = {
   'draw-activated': 'bg-green-500/15 text-green-400',
   'high viscosity': 'bg-amber-500/15 text-amber-400',
   'full ceramic': 'bg-cyan-500/15 text-cyan-400',
+  'big volume': 'bg-red-500/15 text-red-400',
 }
 
 const showDashboardToast = () => {
@@ -62,7 +64,11 @@ export default function ProductCard({ product, onCompare, compareSelected, onCli
   const { user } = useAuth()
   useEffect(() => {
     if (!user || !product.dbId) { setLiked(false); return }
-    supabase.from('favorites').select('product_id').eq('user_id', user.id).eq('product_id', product.dbId).maybeSingle().then(({ data }) => setLiked(Boolean(data)))
+    let active = true
+    void loadFavoriteIds(user.id).then((ids) => {
+      if (active) setLiked(ids.has(product.dbId!))
+    })
+    return () => { active = false }
   }, [user, product.dbId])
 
   async function toggleFavorite(source?: HTMLImageElement | null) {
@@ -70,8 +76,10 @@ export default function ProductCard({ product, onCompare, compareSelected, onCli
     if (!product.dbId) return
     if (liked) await supabase.from('favorites').delete().eq('user_id', user.id).eq('product_id', product.dbId)
     else await supabase.from('favorites').insert({ user_id: user.id, product_id: product.dbId })
-    setLiked(!liked)
-    if (!liked) animateFavorite(source)
+    const next = !liked
+    setFavoriteCached(user.id, product.dbId, next)
+    setLiked(next)
+    if (next) animateFavorite(source)
   }
 
   return (
@@ -98,13 +106,19 @@ export default function ProductCard({ product, onCompare, compareSelected, onCli
         />
 
         {product.images.length > 1 && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+          <div className="absolute bottom-2 left-1/2 z-[1] flex -translate-x-1/2 items-center gap-1">
             {product.images.slice(0, 5).map((_, i) => (
               <button
                 key={i}
+                type="button"
+                aria-label={`Show image ${i + 1}`}
                 onClick={(e) => { e.stopPropagation(); setImgIdx(i) }}
-                className={`w-1.5 h-1.5 rounded-full transition-colors ${i === imgIdx ? 'bg-primary' : 'bg-white/30'}`}
-              />
+                className="flex h-4 w-3 shrink-0 items-center justify-center border-0 bg-transparent p-0"
+              >
+                <span
+                  className={`block h-1.5 w-1.5 rounded-full transition-colors ${i === imgIdx ? 'bg-primary' : 'bg-white/30'}`}
+                />
+              </button>
             ))}
           </div>
         )}
@@ -112,8 +126,9 @@ export default function ProductCard({ product, onCompare, compareSelected, onCli
         <button
           aria-label={`Add ${product.id} to favorites`}
           data-favorite-product={product.id}
+          type="button"
           onClick={(e) => { e.stopPropagation(); void toggleFavorite(e.currentTarget.parentElement?.querySelector('[data-product-image]') as HTMLImageElement | null) }}
-          className="absolute top-3 right-3 text-lg transition-colors"
+          className="absolute top-3 right-3 flex h-6 w-6 shrink-0 items-center justify-center border-0 bg-transparent p-0 text-lg transition-colors"
         >
           {liked
             ? <HeartFilled className="text-primary" />
@@ -124,8 +139,9 @@ export default function ProductCard({ product, onCompare, compareSelected, onCli
           <button
             aria-label={`Add ${product.id} to compare`}
             data-compare-product={product.id}
+            type="button"
             onClick={(e) => { e.stopPropagation(); onCompare(product.id) }}
-            className={`absolute top-3 left-3 w-6 h-6 rounded border flex items-center justify-center transition-colors ${
+            className={`absolute top-3 left-3 flex h-6 w-6 shrink-0 items-center justify-center rounded border p-0 transition-colors ${
               compareSelected
                 ? 'border-primary bg-primary text-black'
                 : 'product-card-compare-idle hover:border-primary'
@@ -150,14 +166,17 @@ export default function ProductCard({ product, onCompare, compareSelected, onCli
         </div>
 
         <div className="flex flex-nowrap items-center gap-1.5">
-          {product.tags.slice(0, 2).map((tag) => (
+          {product.tags.slice(0, 2).map((tag) => {
+            const label = tag === 'big volumn' ? 'big volume' : tag
+            return (
             <span
               key={tag}
-              className={`product-card-tag shrink-0 whitespace-nowrap rounded px-2 py-1 text-[10px] font-medium leading-none ${TAG_COLORS[tag] ?? ''}`}
+              className={`product-card-tag shrink-0 whitespace-nowrap rounded px-2 py-1 text-[10px] font-medium leading-none ${TAG_COLORS[label] ?? TAG_COLORS[tag] ?? ''}`}
             >
-              {tag}
+              {label}
             </span>
-          ))}
+            )
+          })}
           {product.tags.length > 2 && (
             <span className="product-card-tag shrink-0 whitespace-nowrap rounded px-2 py-1 text-[10px] font-medium leading-none">
               +{product.tags.length - 2}

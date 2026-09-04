@@ -19,6 +19,8 @@ export interface Product {
   tags: string[]
   images: string[]
   featured?: boolean
+  createdAt?: string
+  popularity?: number
 }
 
 const productBlueprints: Product[] = [

@@ -6,6 +6,7 @@ import {
   EnvironmentOutlined,
 } from '@ant-design/icons'
 import { Check, Instagram, Linkedin, Mail, MapPin, Phone, Send, Youtube } from 'lucide-react'
+import DsCannabizWordmark from '../ui/DsCannabizWordmark'
 import { supabase } from '../../lib/supabase'
 import './NavbarBrandSwitcher.css'
 
@@ -55,14 +56,7 @@ export default function Footer() {
         <div className="dsc-footer-grid grid grid-cols-1 md:grid-cols-5 gap-12">
           <div className="md:col-span-2 flex flex-col items-start gap-6">
             <Link to="/" className="inline-flex items-center">
-              <img
-                src="/brand-logos/ds-cannabiz-wordmark.svg"
-                alt="DS Cannabiz"
-                width={146}
-                height={26}
-                className="dsc-brand-switcher-wordmark"
-                draggable={false}
-              />
+              <DsCannabizWordmark />
             </Link>
             <p className="dsc-footer-desc text-sm leading-relaxed max-w-xs">
               Your one-stop B2B platform for cannabis products on AI-powered sourcing and 3D CMF customization.

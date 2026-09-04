@@ -11,6 +11,7 @@ import {
 import type { Product } from '../../data/products'
 import { useAuth } from '../../providers/AuthProvider'
 import { supabase } from '../../lib/supabase'
+import { loadFavoriteIds, setFavoriteCached } from '../../lib/favorites'
 
 interface Props {
   product: Product | null
@@ -28,6 +29,7 @@ const TAG_COLORS: Record<string, string> = {
   'full ceramic': 'bg-cyan-500/15 text-cyan-400 border-cyan-500/20',
   'window custom': 'bg-green-500/15 text-green-400 border-green-500/20',
   'big volumn': 'bg-red-500/15 text-red-400 border-red-500/20',
+  'big volume': 'bg-red-500/15 text-red-400 border-red-500/20',
 }
 
 const specs = [
@@ -95,7 +97,11 @@ export default function ProductDetailModal({ product, onClose }: Props) {
 
   useEffect(() => {
     if (!product || !user || !product.dbId) { setLiked(false); return }
-    supabase.from('favorites').select('product_id').eq('user_id', user.id).eq('product_id', product.dbId).maybeSingle().then(({ data }) => setLiked(Boolean(data)))
+    let active = true
+    void loadFavoriteIds(user.id).then((ids) => {
+      if (active) setLiked(ids.has(product.dbId!))
+    })
+    return () => { active = false }
   }, [product, user])
 
   if (!product) return null
@@ -107,8 +113,10 @@ export default function ProductDetailModal({ product, onClose }: Props) {
     if (!product.dbId) return
     if (liked) await supabase.from('favorites').delete().eq('user_id', user.id).eq('product_id', product.dbId)
     else await supabase.from('favorites').insert({ user_id: user.id, product_id: product.dbId })
-    setLiked(!liked)
-    if (!liked) animateFavorite(source)
+    const next = !liked
+    setFavoriteCached(user.id, product.dbId, next)
+    setLiked(next)
+    if (next) animateFavorite(source)
   }
 
   return createPortal((
@@ -203,7 +211,7 @@ export default function ProductDetailModal({ product, onClose }: Props) {
             {/* Header */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-muted uppercase tracking-widest">{product.category}</span>
+                <span className="text-[15px] font-medium uppercase tracking-widest text-[#999999]">{product.category}</span>
                 <div className="flex items-center gap-1.5">
                   {product.stock === 'US' && (
                     <span className="text-[10px] bg-green-500/15 text-green-400 border border-green-500/20 px-2 py-0.5 rounded-full font-medium">
@@ -213,55 +221,69 @@ export default function ProductDetailModal({ product, onClose }: Props) {
                   <span className="text-[10px] text-muted">{product.priceLevel}</span>
                 </div>
               </div>
-              <h2 className="text-4xl font-bold text-white">{product.id}</h2>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => navigator.clipboard?.writeText(`${window.location.origin}/hardware-gallery/${product.id}`)}
-                  className="flex items-center gap-1.5 text-[10px] text-muted hover:text-white transition-colors"
-                >
-                  <ShareAltOutlined /> Share
-                </button>
-                <button data-favorite-product onClick={(event) => void toggleFavorite(event.currentTarget.closest('[role="dialog"]')?.querySelector('[data-modal-product-image]') as HTMLImageElement | null)} className="flex items-center gap-1.5 text-[10px] text-muted hover:text-white transition-colors">
-                  {liked ? <HeartFilled className="text-primary" /> : <HeartOutlined />} Favorite
-                </button>
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-4xl font-bold text-white">{product.id}</h2>
+                <div className="flex shrink-0 items-center gap-3">
+                  <button
+                    onClick={() => navigator.clipboard?.writeText(`${window.location.origin}/hardware-gallery/${product.id}`)}
+                    className="flex items-center gap-1.5 text-[15px] text-white transition-colors"
+                  >
+                    <ShareAltOutlined /> Share
+                  </button>
+                  <button data-favorite-product onClick={(event) => void toggleFavorite(event.currentTarget.closest('[role="dialog"]')?.querySelector('[data-modal-product-image]') as HTMLImageElement | null)} className="flex items-center gap-1.5 text-[15px] text-white transition-colors">
+                    {liked ? <HeartFilled className="text-primary" /> : <HeartOutlined />} Favorite
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* Tags */}
             {product.tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
-                {product.tags.map((tag) => (
+                {product.tags.map((tag) => {
+                  const label = tag === 'big volumn' ? 'big volume' : tag
+                  return (
                   <span
                     key={tag}
-                    className={`px-2.5 py-1 text-[10px] rounded-lg border font-medium ${TAG_COLORS[tag] ?? 'bg-white/10 text-white/60 border-white/10'}`}
+                    className={`px-2.5 py-1 text-[10px] rounded-lg border font-medium ${TAG_COLORS[label] ?? TAG_COLORS[tag] ?? 'bg-white/10 text-white/60 border-white/10'}`}
                   >
-                    {tag}
+                    {label}
                   </span>
-                ))}
+                  )
+                })}
               </div>
             )}
 
             <div className="grid grid-cols-2 gap-4">
-              <button data-request-quote type="button" onClick={() => openSalesRequest(product, 'quote')} className="btn-primary h-12">▣ &nbsp; Request Quote</button>
-              <button data-order-sample type="button" onClick={() => openSalesRequest(product, 'sample')} className="h-12 rounded-md bg-white font-semibold text-black">Order Sample</button>
+              <button
+                data-request-quote
+                type="button"
+                onClick={() => openSalesRequest(product, 'quote')}
+                className="btn-primary flex h-12 items-center justify-center gap-2"
+              >
+                <svg className="h-[18px] w-[18px] shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M3.2 5.2h3.1c.3 0 .6.2.7.5l.4 1.3h11.4c.6 0 1 .6.9 1.2l-1.2 6.3c-.1.6-.7 1.1-1.3 1.1H8.6c-.6 0-1.1-.4-1.3-1L4.4 5.8H2.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="9.2" cy="19.1" r="1.55" fill="currentColor"/>
+                  <circle cx="16.6" cy="19.1" r="1.55" fill="currentColor"/>
+                </svg>
+                Request Quote
+              </button>
+              <button data-order-sample type="button" onClick={() => openSalesRequest(product, 'sample')} className="h-12 rounded-lg bg-white font-semibold text-black">Order Sample</button>
             </div>
 
             {/* Specs */}
-            <div className="space-y-1">
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Specifications</h3>
-              <div className="rounded-xl overflow-hidden border border-[#2A2A2A]">
-                {specs.map(({ key, label }, i) => {
+            <div className="pt-2">
+              <h3 className="mb-3 font-['Sora'] text-base font-bold tracking-wider text-gray-400">Specifications</h3>
+              <div className="dsc-product-specs">
+                {specs.flatMap(({ key, label }) => {
                   const val = product[key as keyof Product]
-                  if (!val || val === 'N/A') return null
-                  return (
-                    <div
-                      key={key}
-                      className={`grid grid-cols-2 text-xs ${i % 2 === 0 ? 'bg-[#0D0D0D]' : 'bg-[#111]'}`}
-                    >
-                      <span className="px-3 py-2 text-muted font-medium">{label}</span>
-                      <span className="px-3 py-2 text-white">{String(val)}</span>
+                  if (!val || val === 'N/A') return []
+                  return [(
+                    <div key={key} className="dsc-product-specs-row">
+                      <span className="dsc-product-specs-label">{label}</span>
+                      <span className="dsc-product-specs-value">{String(val)}</span>
                     </div>
-                  )
+                  )]
                 })}
               </div>
             </div>

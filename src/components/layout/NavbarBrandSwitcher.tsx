@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 import { Dropdown } from 'antd'
 import { SwapOutlined } from '@ant-design/icons'
 import { motion, useReducedMotion } from 'framer-motion'
+import DsCannabizWordmark from '../ui/DsCannabizWordmark'
 import './NavbarBrandSwitcher.css'
 
-const DS_WORDMARK = '/brand-logos/ds-cannabiz-wordmark.svg'
 const DAWSEN_ICON = '/brand-logos/dawsen-icon.svg'
 
 export default function NavbarBrandSwitcher() {
@@ -21,14 +21,7 @@ export default function NavbarBrandSwitcher() {
         className="dsc-brand-switcher-item dsc-brand-switcher-item--active"
         onClick={() => setOpen(false)}
       >
-        <img
-          src={DS_WORDMARK}
-          alt="DS Cannabiz"
-          width={146}
-          height={26}
-          className="dsc-brand-switcher-wordmark"
-          draggable={false}
-        />
+        <DsCannabizWordmark />
       </Link>
       <a
         href="https://dawsenai.com"
@@ -71,14 +64,7 @@ export default function NavbarBrandSwitcher() {
           aria-expanded={open}
           className="dsc-brand-switcher-trigger"
         >
-          <img
-            src={DS_WORDMARK}
-            alt="DS Cannabiz"
-            width={146}
-            height={26}
-            className="dsc-brand-switcher-wordmark"
-            draggable={false}
-          />
+          <DsCannabizWordmark />
           <SwapOutlined className="dsc-brand-switcher-trigger-icon" aria-hidden="true" />
         </button>
       </Dropdown>
